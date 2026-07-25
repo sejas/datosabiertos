@@ -211,7 +211,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
 > Con el prior art encontrado, **esta es la contribución principal del TFM**, no la secundaria.
 > Trátala como tal: es lo que se publica con DOI y lo que otros reutilizarán.
 
-- [ ] **4.1 — Diseño del esquema del banco**
+- [x] **4.1 — Diseño del esquema del banco** ✅ 25/07/2026
   **DONE IS:**
   - Esquema JSON documentado con: pregunta, dificultad (fácil/media/difícil), tipo (mono o
     multiciudad), ciudad(es), dataset(s) de referencia, traza de herramientas esperada,
@@ -219,7 +219,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
   - Validador que rechaza entradas mal formadas.
   - Justificado por qué esos campos y no otros, con apoyo en los benchmarks de la fase 1.
 
-- [ ] **4.2 — Redactar 80–120 preguntas en español**
+- [~] **4.2 — Redactar 80–120 preguntas en español** — 15 preguntas semilla verificadas; faltan 65+
   Distribuidas por dificultad y por ciudad del corpus, incluyendo casos que **deben fallar**
   (datos que no existen) para medir alucinación.
   **DONE IS:**

@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/asejas/tfm-mcp-datos-abiertos/bench/esquema.json",
+  "title": "BDAM-es — Banco de preguntas sobre catálogos de Datos Abiertos Municipales en español",
+  "description": "Esquema del banco de evaluación del TFM (TODO 4.1). La justificación campo a campo está en bench/esquema.md; la metodología, en bench/README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version_esquema",
+    "identificador_banco",
+    "version_banco",
+    "fecha",
+    "licencia",
+    "instantanea_indice",
+    "preguntas"
+  ],
+  "properties": {
+    "version_esquema": {
+      "description": "Versión del esquema con la que se validan las preguntas. Un cambio incompatible obliga a subirla.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "identificador_banco": {
+      "description": "Identificador corto y estable del banco. Prefijo de los identificadores de pregunta.",
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "version_banco": {
+      "description": "Versión semántica del contenido. Cambia con cada publicación en Zenodo.",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "fecha": {
+      "description": "Fecha de la versión, ISO-8601 (AAAA-MM-DD).",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "licencia": {
+      "description": "Licencia del banco. Debe ser compatible con la más restrictiva de las ingeridas (by-sa-40 de Málaga).",
+      "type": "string",
+      "minLength": 3
+    },
+    "doi": {
+      "description": "DOI de Zenodo. Vacío hasta la primera publicación (TODO 4.4).",
+      "type": "string"
+    },
+    "instantanea_indice": {
+      "description": "Instantánea del índice local contra la que se verificaron las respuestas. Sin esto el banco no es reproducible: los portales cambian.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruta", "fecha_sincronizacion", "n_datasets", "portales"],
+      "properties": {
+        "ruta": { "type": "string", "minLength": 1 },
+        "fecha_sincronizacion": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "n_datasets": { "type": "integer", "minimum": 1 },
+        "n_distribuciones": { "type": "integer", "minimum": 0 },
+        "version_esquema_indice": { "type": "integer", "minimum": 1 },
+        "portales": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/portal" }
+        }
+      }
+    },
+    "preguntas": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/pregunta" }
+    }
+  },
+
+  "$defs": {
+    "portal": {
+      "description": "Identificador de portal tal y como aparece en tfm.configuracion.CORPUS.",
+      "type": "string",
+      "enum": ["madrid", "barcelona", "malaga", "cordoba", "reus"]
+    },
+
+    "herramienta": {
+      "description": "Herramientas MCP del §4 de PLAN.md. `consultar_sparql` queda fuera hasta que se resuelva el TODO 3.5.",
+      "type": "string",
+      "enum": [
+        "buscar_datasets",
+        "detalle_dataset",
+        "listar_distribuciones",
+        "comparar_ciudades"
+      ]
+    },
+
+    "id_canonico": {
+      "description": "Identificador cualificado <portal>:<identificador_origen>. Los ids de CKAN solo son únicos dentro de su portal.",
+      "type": "string",
+      "pattern": "^(madrid|barcelona|malaga|cordoba|reus):[A-Za-z0-9._~%-]+$"
+    },
+
+    "referencia_dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["portal", "identificador", "url_origen"],
+      "properties": {
+        "portal": { "$ref": "#/$defs/portal" },
+        "identificador": {
+          "description": "Identificador en el portal de origen (`dataset.identificador_origen` del índice).",
+          "type": "string",
+          "minLength": 1
+        },
+        "url_origen": {
+          "description": "URL de la ficha en el portal municipal. Exigida por el RD 1495/2011 art. 8 (citar la fuente).",
+          "type": "string",
+          "pattern": "^https?://"
+        },
+        "titulo": {
+          "description": "Título tal y como está en el índice, para que un humano reconozca el dataset sin abrir la URL.",
+          "type": "string"
+        },
+        "rol": {
+          "description": "`principal` es el dataset que hay que recuperar; `secundario` es una coincidencia también válida (cuenta para precision@k, no para acierto exacto).",
+          "type": "string",
+          "enum": ["principal", "secundario"]
+        }
+      }
+    },
+
+    "llamada_esperada": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["herramienta", "argumentos"],
+      "properties": {
+        "herramienta": { "$ref": "#/$defs/herramienta" },
+        "argumentos": {
+          "description": "Argumentos esperados. Un argumento ausente significa 'no se exige'; nunca 'debe ir vacío'.",
+          "type": "object"
+        },
+        "obligatoria": {
+          "description": "Si es falso, la llamada es aceptable pero no exigida al puntuar la traza.",
+          "type": "boolean"
+        },
+        "resultado_esperado": {
+          "description": "Qué debe devolver la llamada. `vacio` marca los callejones sin salida legítimos (p. ej. buscar en castellano en un catálogo en catalán).",
+          "type": "string",
+          "enum": ["con_resultados", "vacio"]
+        },
+        "nota": { "type": "string" }
+      }
+    },
+
+    "comprobacion_vacia": {
+      "description": "Consulta que debe devolver cero resultados sobre la instantánea del índice. Es lo que hace falsable la marca `sin_respuesta`.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["consulta"],
+      "properties": {
+        "consulta": { "type": "string", "minLength": 1 },
+        "ciudad": { "$ref": "#/$defs/portal" }
+      }
+    },
+
+    "pregunta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "pregunta",
+        "dificultad",
+        "tipo",
+        "ciudades",
+        "sin_respuesta",
+        "datasets_referencia",
+        "traza_esperada",
+        "respuesta_referencia",
+        "criterios_respuesta",
+        "notas_anotador",
+        "anotador",
+        "fecha_anotacion",
+        "verificacion"
+      ],
+      "properties": {
+        "id": {
+          "description": "Identificador estable y citable. No se reutiliza aunque la pregunta se retire.",
+          "type": "string",
+          "pattern": "^[a-z0-9-]+-[0-9]{3}$"
+        },
+        "pregunta": {
+          "description": "Enunciado en español, tal y como lo escribiría una persona no técnica.",
+          "type": "string",
+          "minLength": 15
+        },
+        "dificultad": {
+          "type": "string",
+          "enum": ["facil", "media", "dificil"]
+        },
+        "tipo": {
+          "type": "string",
+          "enum": ["monociudad", "multiciudad"]
+        },
+        "ciudades": {
+          "description": "Portales implicados. En las preguntas sin respuesta, la ciudad donde se buscó.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/portal" }
+        },
+        "sin_respuesta": {
+          "description": "Cierto si el dato no existe en la instantánea. Control de alucinación.",
+          "type": "boolean"
+        },
+        "motivo_sin_respuesta": {
+          "description": "Obligatorio cuando `sin_respuesta` es cierto. Permite analizar los errores por causa y no en bloque.",
+          "type": "string",
+          "enum": [
+            "tema_inexistente_en_la_ciudad",
+            "periodo_inexistente",
+            "formato_inexistente",
+            "granularidad_inexistente",
+            "fuera_del_corpus"
+          ]
+        },
+        "datasets_referencia": {
+          "description": "Respuesta de oro para la métrica de recuperación. Vacío si `sin_respuesta`.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/referencia_dataset" }
+        },
+        "datasets_proximos": {
+          "description": "Cuasi-aciertos: lo más parecido que sí existe. Ofrecerlos es correcto; presentarlos como la respuesta pedida es un fallo. Solo tienen sentido con `sin_respuesta`.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/referencia_dataset" }
+        },
+        "traza_esperada": {
+          "description": "Secuencia mínima de llamadas. Es la referencia de la métrica de corrección de traza del §6 de PLAN.md.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/llamada_esperada" }
+        },
+        "comprobaciones_vacias": {
+          "description": "Obligatorio (≥2) cuando `sin_respuesta` es cierto: reejecutables por el validador con `--indice`.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/comprobacion_vacia" }
+        },
+        "respuesta_referencia": {
+          "description": "Respuesta modelo en español, con procedencia. No es la única redacción válida: se puntúa contra `criterios_respuesta`.",
+          "type": "string",
+          "minLength": 30
+        },
+        "criterios_respuesta": {
+          "description": "Afirmaciones comprobables que la respuesta debe contener (o no contener, con el prefijo NO:). Convierten la fidelidad en algo auditable en vez de 'a ojo' (TODO 5.2).",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 5 }
+        },
+        "etiquetas": {
+          "description": "Fenómeno que la pregunta ejercita. Permite cortar los resultados por causa en el análisis de errores.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "recuperacion-directa",
+              "procedencia",
+              "licencia",
+              "licencia-no-declarada",
+              "licencia-compartir-igual",
+              "formatos",
+              "frescura",
+              "conteo",
+              "agregacion",
+              "comparacion",
+              "multiciudad",
+              "multilingue",
+              "heterogeneidad",
+              "reintento-de-consulta",
+              "ausencia-parcial",
+              "sin-respuesta",
+              "alucinacion",
+              "cordoba-peor-caso"
+            ]
+          }
+        },
+        "notas_anotador": {
+          "description": "Por qué la pregunta es así y qué la hace difícil. Es lo que permite a un segundo anotador reproducir el criterio (TODO 4.3).",
+          "type": "string",
+          "minLength": 20
+        },
+        "anotador": {
+          "description": "Identificador seudonimizado del anotador (A1, A2…), para calcular el acuerdo entre anotadores.",
+          "type": "string",
+          "pattern": "^A[0-9]+$"
+        },
+        "fecha_anotacion": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "verificacion": {
+          "description": "Cómo se comprobó la respuesta. Sin esto, 'verificado a mano' no es auditable.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["metodo", "fecha"],
+          "properties": {
+            "metodo": {
+              "type": "string",
+              "enum": ["indice-local", "portal-en-vivo", "ambos"]
+            },
+            "fecha": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "comandos": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "sin_respuesta": { "const": true } } },
+          "then": {
+            "required": [
+              "motivo_sin_respuesta",
+              "comprobaciones_vacias"
+            ],
+            "properties": {
+              "datasets_referencia": { "maxItems": 0 },
+              "comprobaciones_vacias": { "minItems": 2 }
+            }
+          },
+          "else": {
+            "properties": {
+              "datasets_referencia": { "minItems": 1 },
+              "datasets_proximos": { "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "tipo": { "const": "multiciudad" } } },
+          "then": { "properties": { "ciudades": { "minItems": 2 } } },
+          "else": { "properties": { "ciudades": { "maxItems": 1 } } }
+        }
+      ]
+    }
+  }
+}

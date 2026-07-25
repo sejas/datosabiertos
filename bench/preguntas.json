@@ -1,0 +1,1002 @@
+{
+  "version_esquema": 1,
+  "identificador_banco": "bdam-es",
+  "version_banco": "0.1.0",
+  "fecha": "2026-07-25",
+  "licencia": "CC-BY-SA-4.0",
+  "doi": "",
+  "instantanea_indice": {
+    "ruta": "datos/indice.sqlite",
+    "fecha_sincronizacion": "2026-07-25",
+    "n_datasets": 2862,
+    "n_distribuciones": 23390,
+    "version_esquema_indice": 1,
+    "portales": ["madrid", "barcelona", "malaga", "cordoba", "reus"]
+  },
+  "preguntas": [
+    {
+      "id": "bdam-es-001",
+      "pregunta": "¿Dónde puedo consultar los niveles de calidad del aire de Madrid medidos en tiempo real?",
+      "dificultad": "facil",
+      "tipo": "monociudad",
+      "ciudades": ["madrid"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "madrid",
+          "identificador": "212531-0-calidad-aire-tiempo-real",
+          "url_origen": "https://datos.madrid.es/dataset/212531-0-calidad-aire-tiempo-real",
+          "titulo": "Calidad del aire. Datos en tiempo real",
+          "rol": "principal"
+        },
+        {
+          "portal": "madrid",
+          "identificador": "300755-0-calidad-aire-tiempo-real-acumula",
+          "url_origen": "https://datos.madrid.es/dataset/300755-0-calidad-aire-tiempo-real-acumula",
+          "titulo": "Calidad del aire. Datos en tiempo real acumulado",
+          "rol": "secundario"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "calidad del aire tiempo real", "ciudad": "madrid" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        },
+        {
+          "herramienta": "detalle_dataset",
+          "argumentos": { "id": "madrid:212531-0-calidad-aire-tiempo-real" },
+          "obligatoria": false,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "El Ayuntamiento de Madrid publica «Calidad del aire. Datos en tiempo real» en https://datos.madrid.es/dataset/212531-0-calidad-aire-tiempo-real, con 5 distribuciones (JSON, XML y CSV servidos por la API de Ciudades Abiertas, una descripción de API y un PDF con el intérprete de ficheros). Licencia CC-BY. Última modificación en origen: 11/06/2026; datos sincronizados en el índice el 25/07/2026.",
+      "criterios_respuesta": [
+        "Cita el dataset «Calidad del aire. Datos en tiempo real»",
+        "Incluye la URL de la ficha en datos.madrid.es",
+        "Menciona la licencia CC-BY",
+        "NO: atribuye el dataset a un ayuntamiento distinto de Madrid"
+      ],
+      "etiquetas": ["recuperacion-directa", "procedencia"],
+      "notas_anotador": "Caso base de recuperación directa: el vocabulario de la pregunta coincide casi literalmente con el título. Sirve de suelo: si un modelo falla aquí, el problema no son los metadatos. Se admite como secundario el dataset «acumulado», que un usuario podría querer, pero no como respuesta única.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "python3 -m tfm.index buscar 'calidad del aire tiempo real' --portal madrid --limite 5"
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-002",
+      "pregunta": "¿Ha publicado el Ayuntamiento de Málaga el presupuesto municipal de 2026?",
+      "dificultad": "facil",
+      "tipo": "monociudad",
+      "ciudades": ["malaga"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "malaga",
+          "identificador": "acfe6d6c-e2d7-4ee8-a16c-a61c079cd4c5",
+          "url_origen": "https://datosabiertos.malaga.eu/dataset/presupuestos-2026",
+          "titulo": "Presupuestos 2026",
+          "rol": "principal"
+        },
+        {
+          "portal": "malaga",
+          "identificador": "52cfebb2-a144-41e0-ad5c-68f3318b3b23",
+          "url_origen": "https://datosabiertos.malaga.eu/dataset/presupuestos-entidades-2026",
+          "titulo": "Presupuestos entidades 2026",
+          "rol": "secundario"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "presupuestos 2026", "ciudad": "malaga" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "Sí. Málaga publica «Presupuestos 2026» (https://datosabiertos.malaga.eu/dataset/presupuestos-2026), con una distribución y última modificación en origen el 27/04/2026. Hay además desgloses del mismo ejercicio: «Presupuestos entidades 2026» y «Presupuestos estructura orgánica 2026». La licencia es CC BY-SA 4.0 (`by-sa-40`), es decir, obliga a atribuir y a compartir cualquier obra derivada con la misma licencia.",
+      "criterios_respuesta": [
+        "Responde afirmativamente y cita «Presupuestos 2026»",
+        "Incluye la URL de datosabiertos.malaga.eu",
+        "Indica que la licencia es CC BY-SA 4.0 o equivalente",
+        "NO: describe la licencia de Málaga como CC-BY sin compartir igual"
+      ],
+      "etiquetas": ["recuperacion-directa", "licencia", "licencia-compartir-igual"],
+      "notas_anotador": "Pregunta de sí/no con dato de apoyo. Se anota como fácil porque el título contiene literalmente el año. Interesa porque obliga a nombrar la licencia `by-sa-40` de Málaga, que es la que contamina cualquier obra derivada y condiciona la licencia del propio banco.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": ["python3 -m tfm.index buscar 'presupuestos 2026' --portal malaga --limite 5"]
+      }
+    },
+
+    {
+      "id": "bdam-es-003",
+      "pregunta": "¿Qué conjunto de datos publica el Ayuntamiento de Reus con la relación de farmacias del municipio?",
+      "dificultad": "facil",
+      "tipo": "monociudad",
+      "ciudades": ["reus"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "reus",
+          "identificador": "d8321f0b-4e57-4e6e-a3f6-a86ec76a525d",
+          "url_origen": "https://opendata.reus.cat/dataset/farmacies",
+          "titulo": "Farmàcies",
+          "rol": "principal"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "farmacias", "ciudad": "reus" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "Reus publica «Farmàcies» (https://opendata.reus.cat/dataset/farmacies), con una distribución en CSV y última modificación en origen el 30/06/2026, bajo licencia CC-BY. El catálogo de Reus está redactado íntegramente en catalán: el título es «Farmàcies», no «Farmacias».",
+      "criterios_respuesta": [
+        "Cita el dataset «Farmàcies» con su URL en opendata.reus.cat",
+        "Indica que la distribución está en CSV",
+        "NO: traduce el título al castellano presentándolo como el título oficial"
+      ],
+      "etiquetas": ["recuperacion-directa", "multilingue"],
+      "notas_anotador": "Fácil por casualidad afortunada: la raíz «farmacia» encaja por prefijo con «farmàcies» una vez el índice quita los acentos, así que la consulta en castellano funciona. Se incluye a propósito junto a bdam-es-006 y bdam-es-009, donde el mismo truco falla, para que el banco muestre que el éxito de la búsqueda entre lenguas es azaroso, no sistemático.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": ["python3 -m tfm.index buscar 'farmacias' --portal reus --limite 5"]
+      }
+    },
+
+    {
+      "id": "bdam-es-004",
+      "pregunta": "¿Con qué licencia puedo reutilizar el conjunto de datos de calidad del aire del Ayuntamiento de Córdoba?",
+      "dificultad": "facil",
+      "tipo": "monociudad",
+      "ciudades": ["cordoba"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "cordoba",
+          "identificador": "75add831-88c2-4677-b5fd-99bc4f190490",
+          "url_origen": "https://datosabiertos.cordoba.es/dataset/calidad-del-aire",
+          "titulo": "Calidad del aire",
+          "rol": "principal"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "calidad del aire", "ciudad": "cordoba" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        },
+        {
+          "herramienta": "detalle_dataset",
+          "argumentos": { "id": "cordoba:75add831-88c2-4677-b5fd-99bc4f190490" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "El conjunto existe —«Calidad del aire», https://datosabiertos.cordoba.es/dataset/calidad-del-aire— pero **no declara ninguna licencia**: el portal no informa de las condiciones de reutilización. No es un descuido aislado: en la instantánea del 25/07/2026 los 145 datasets del portal de Córdoba carecen de licencia declarada (83 la dan como `notspecified` y 62 no traen el campo). La Ley 37/2007 ampara la reutilización de la información del sector público, pero sin licencia expresa conviene consultar al Ayuntamiento antes de redistribuir, y en ningún caso debe asumirse CC-BY.",
+      "criterios_respuesta": [
+        "Afirma que el dataset no declara licencia",
+        "Señala que la ausencia afecta a todo el portal de Córdoba (145 de 145)",
+        "Recomienda consultar al organismo o actuar con cautela antes de redistribuir",
+        "NO: afirma o insinúa que la licencia es CC-BY, CC0 u otra licencia concreta"
+      ],
+      "etiquetas": [
+        "licencia",
+        "licencia-no-declarada",
+        "cordoba-peor-caso",
+        "procedencia",
+        "alucinacion"
+      ],
+      "notas_anotador": "Pregunta corta con una trampa muy concreta: el reflejo del modelo es contestar «CC-BY, como casi todos los portales españoles». Es falso aquí. El índice marca `licencia.declarada = 0` y el identificador reservado `no-declarada` justamente para que la herramienta pueda decirlo. Cubre el criterio de procedencia del TODO 3.2 desde el lado de la evaluación.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "python3 -m tfm.index buscar 'calidad del aire' --portal cordoba --limite 5",
+          "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset d JOIN licencia l ON l.id=d.licencia_id WHERE d.portal_id='cordoba' AND l.declarada=0\""
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-005",
+      "pregunta": "¿Publica Madrid un inventario del arbolado de sus parques y zonas verdes?",
+      "dificultad": "facil",
+      "tipo": "monociudad",
+      "ciudades": ["madrid"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "madrid",
+          "identificador": "300264-0-arbolado-parques-historico",
+          "url_origen": "https://datos.madrid.es/dataset/300264-0-arbolado-parques-historico",
+          "titulo": "Arbolado en parques y zonas verdes de Madrid",
+          "rol": "principal"
+        },
+        {
+          "portal": "madrid",
+          "identificador": "300761-0-arbolado-especies",
+          "url_origen": "https://datos.madrid.es/dataset/300761-0-arbolado-especies",
+          "titulo": "Arbolado en parques y zonas verdes de Madrid (detalle)",
+          "rol": "secundario"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "arbolado parques zonas verdes", "ciudad": "madrid" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "Sí. Madrid publica «Arbolado en parques y zonas verdes de Madrid» (https://datos.madrid.es/dataset/300264-0-arbolado-parques-historico), con 107 distribuciones y última modificación en origen el 25/06/2026, y una versión de detalle por especies, «Arbolado en parques y zonas verdes de Madrid (detalle)» (https://datos.madrid.es/dataset/300761-0-arbolado-especies), con 9 distribuciones. Ambos con licencia CC-BY.",
+      "criterios_respuesta": [
+        "Responde que sí y cita el dataset principal de arbolado en parques",
+        "Incluye al menos una URL de datos.madrid.es",
+        "NO: cita un número de distribuciones distinto de 107 para el dataset principal"
+      ],
+      "etiquetas": ["recuperacion-directa", "procedencia"],
+      "notas_anotador": "Pareja deliberada de bdam-es-012 y bdam-es-014: el mismo tema en la ciudad donde sí existe. Permite comprobar si el modelo generaliza indebidamente («si Madrid lo tiene, Reus también»). El criterio de las 107 distribuciones fuerza a que el dato salga de la herramienta y no de la memoria.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "python3 -m tfm.index buscar 'arbolado parques zonas verdes' --portal madrid --limite 5"
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-006",
+      "pregunta": "¿Qué datos publica Barcelona sobre el arbolado viario de la ciudad?",
+      "dificultad": "media",
+      "tipo": "monociudad",
+      "ciudades": ["barcelona"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "barcelona",
+          "identificador": "27b3f8a7-e536-4eea-b025-ce094817b2bd",
+          "url_origen": "https://opendata-ajuntament.barcelona.cat/data/dataset/arbrat-viari",
+          "titulo": "Street trees of the city of Barcelona",
+          "rol": "principal"
+        },
+        {
+          "portal": "barcelona",
+          "identificador": "99ce00b1-36ab-4e06-b1bc-c60c5f7a811d",
+          "url_origen": "https://opendata-ajuntament.barcelona.cat/data/dataset/arbrat-parcs",
+          "titulo": "Trees in the parks of the city of Barcelona",
+          "rol": "secundario"
+        },
+        {
+          "portal": "barcelona",
+          "identificador": "9b525e1d-13b8-48f1-abf6-f5cd03baa1dd",
+          "url_origen": "https://opendata-ajuntament.barcelona.cat/data/dataset/arbrat-zona",
+          "titulo": "Zone trees of the city of Barcelona",
+          "rol": "secundario"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "arbolado viario", "ciudad": "barcelona" },
+          "obligatoria": false,
+          "resultado_esperado": "vacio",
+          "nota": "Callejón sin salida legítimo: la consulta en castellano no devuelve nada."
+        },
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "arbrat viari", "ciudad": "barcelona" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        },
+        {
+          "herramienta": "detalle_dataset",
+          "argumentos": { "id": "barcelona:27b3f8a7-e536-4eea-b025-ce094817b2bd" },
+          "obligatoria": false,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "Barcelona publica el arbolado en tres conjuntos: «Street trees of the city of Barcelona» (arbrat-viari, 94 distribuciones), «Trees in the parks of the city of Barcelona» (arbrat-parcs, 46) y «Zone trees of the city of Barcelona» (arbrat-zona, 90), todos con licencia CC-BY-4.0. El que corresponde al arbolado viario es el primero: https://opendata-ajuntament.barcelona.cat/data/dataset/arbrat-viari. Aviso: el campo `title` del catálogo de Barcelona está en inglés (el castellano vive en `title_translated.es`, que el índice no usa como título principal), así que buscar literalmente «arbolado viario» no devuelve nada y hay que reformular en catalán o en inglés.",
+      "criterios_respuesta": [
+        "Identifica arbrat-viari como el conjunto de arbolado viario",
+        "Incluye la URL de opendata-ajuntament.barcelona.cat",
+        "Explica que los títulos de Barcelona están en inglés y por eso falla la búsqueda en castellano",
+        "NO: concluye que Barcelona no publica datos de arbolado"
+      ],
+      "etiquetas": [
+        "multilingue",
+        "heterogeneidad",
+        "reintento-de-consulta",
+        "recuperacion-directa"
+      ],
+      "notas_anotador": "Verificado: `buscar 'arbolado viario' --portal barcelona` devuelve 0 resultados y `buscar 'arbrat viari' --portal barcelona` devuelve los tres. La causa está medida sobre el JSON crudo del índice: el CKAN de Barcelona rellena `title` en inglés y guarda ca/es en `title_translated`. Es el ejemplo canónico de la heterogeneidad del TODO 2.4 y la razón de que esta pregunta no sea fácil pese a ser una recuperación de un solo dataset.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "python3 -m tfm.index buscar 'arbolado viario' --portal barcelona --limite 5",
+          "python3 -m tfm.index buscar 'arbrat viari' --portal barcelona --limite 5"
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-007",
+      "pregunta": "¿En qué formatos puedo descargarme el arbolado de parques y zonas verdes de Madrid?",
+      "dificultad": "media",
+      "tipo": "monociudad",
+      "ciudades": ["madrid"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "madrid",
+          "identificador": "300264-0-arbolado-parques-historico",
+          "url_origen": "https://datos.madrid.es/dataset/300264-0-arbolado-parques-historico",
+          "titulo": "Arbolado en parques y zonas verdes de Madrid",
+          "rol": "principal"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "arbolado parques y zonas verdes", "ciudad": "madrid" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        },
+        {
+          "herramienta": "listar_distribuciones",
+          "argumentos": { "id": "madrid:300264-0-arbolado-parques-historico" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "El conjunto «Arbolado en parques y zonas verdes de Madrid» tiene 107 distribuciones repartidas en tres formatos: 50 en XLSX, 49 en CSV y 8 en PDF. Para análisis conviene CSV o XLSX; los 8 PDF son documentación, no datos reutilizables. Ficha: https://datos.madrid.es/dataset/300264-0-arbolado-parques-historico, licencia CC-BY.",
+      "criterios_respuesta": [
+        "Enumera los formatos CSV, XLSX y PDF",
+        "Da el total de 107 distribuciones o el desglose 50/49/8",
+        "Distingue los formatos reutilizables (CSV/XLSX) del PDF",
+        "NO: menciona formatos que el dataset no tiene, como JSON, SHP o GeoJSON"
+      ],
+      "etiquetas": ["formatos", "conteo", "recuperacion-directa"],
+      "notas_anotador": "Obliga a encadenar dos herramientas: `buscar_datasets` no basta, hay que bajar a `listar_distribuciones`. El criterio negativo sobre JSON/SHP no es gratuito: son los formatos que un modelo espera de un dataset geográfico municipal y los inventa con facilidad. Desglose comprobado por SQL sobre la tabla `distribucion`.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "sqlite3 datos/indice.sqlite \"SELECT formato, count(*) FROM distribucion WHERE dataset_id=(SELECT id FROM dataset WHERE identificador_origen='300264-0-arbolado-parques-historico') GROUP BY formato\""
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-008",
+      "pregunta": "Quiero publicar un mapa de ruido que combine los datos del Mapa Estratégico de Ruido de Málaga y los de Barcelona. ¿Cuántos conjuntos hay en cada ciudad y qué licencia tendría que ponerle al resultado?",
+      "dificultad": "media",
+      "tipo": "multiciudad",
+      "ciudades": ["malaga", "barcelona"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "malaga",
+          "identificador": "75f54e55-1ff5-4c9c-9fd1-3c173e8534fd",
+          "url_origen": "https://datosabiertos.malaga.eu/dataset/informacion-sig-mapa-estrategico-de-ruido-de-malaga-ruido-total-indice-lden",
+          "titulo": "Información SIG Mapa Estratégico de Ruido de Málaga - Ruido total Índice Lden",
+          "rol": "principal"
+        },
+        {
+          "portal": "malaga",
+          "identificador": "936858ef-14a0-456a-a4bf-cbe4e4eb1a23",
+          "url_origen": "https://datosabiertos.malaga.eu/dataset/informacion-sig-mapa-estrategico-de-ruido-de-malaga-ruido-total-indice-lnoche",
+          "titulo": "Información SIG Mapa Estratégico de Ruido de Málaga - Ruido total Índice Lnoche",
+          "rol": "secundario"
+        },
+        {
+          "portal": "barcelona",
+          "identificador": "402acbd6-0369-4a5c-beb2-2e1d4f71dcb1",
+          "url_origen": "https://opendata-ajuntament.barcelona.cat/data/dataset/isofones-mapa-estrategic-soroll",
+          "titulo": "Noise contour maps from Strategic Noise Map of the city of Barcelona",
+          "rol": "principal"
+        },
+        {
+          "portal": "barcelona",
+          "identificador": "34fb5caa-d1bb-40ae-b0f4-d5ea531555ae",
+          "url_origen": "https://opendata-ajuntament.barcelona.cat/data/dataset/tramer-mapa-estrategic-soroll",
+          "titulo": "Noise maps by street section from Strategic Noise Map of the city of Barcelona",
+          "rol": "secundario"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "comparar_ciudades",
+          "argumentos": { "tema": "mapa estratégico de ruido", "ciudades": ["malaga", "barcelona"] },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        },
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "mapa estrategic soroll", "ciudad": "barcelona" },
+          "obligatoria": false,
+          "resultado_esperado": "con_resultados"
+        },
+        {
+          "herramienta": "detalle_dataset",
+          "argumentos": { "id": "malaga:75f54e55-1ff5-4c9c-9fd1-3c173e8534fd" },
+          "obligatoria": false,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "Málaga publica 32 conjuntos de «Información SIG Mapa Estratégico de Ruido de Málaga», desglosados por fuente de ruido (total, industrial, viario, conflicto…) y por índice acústico (Lden, Ldía, Ltarde, Lnoche), todos con licencia CC BY-SA 4.0 (`by-sa-40`). Barcelona publica 6 conjuntos de su Mapa Estratégico de Ruido —isófonas (52 distribuciones), tramos de calle (20), ráster (25), fachadas (2), población expuesta (9) y zonificación acústica (18)—, todos con licencia CC-BY-4.0. Al mezclar ambas fuentes, la licencia más restrictiva manda: el mapa resultante es una obra derivada de material CC BY-SA 4.0, así que tendrías que publicarlo bajo CC BY-SA 4.0 y atribuir a los dos ayuntamientos. Ojo con la búsqueda: en Barcelona el conjunto se llama «mapa estratègic del soroll» y sus títulos están en inglés, así que la consulta en castellano no lo encuentra.",
+      "criterios_respuesta": [
+        "Da el número de conjuntos de cada ciudad (32 en Málaga, 6 en Barcelona)",
+        "Identifica la licencia de Málaga como CC BY-SA 4.0 y la de Barcelona como CC-BY-4.0",
+        "Concluye que el resultado combinado debe publicarse como CC BY-SA 4.0",
+        "NO: afirma que basta con atribuir sin compartir igual",
+        "NO: omite a Barcelona por no encontrarla buscando en castellano"
+      ],
+      "etiquetas": [
+        "multiciudad",
+        "comparacion",
+        "conteo",
+        "licencia",
+        "licencia-compartir-igual",
+        "multilingue"
+      ],
+      "notas_anotador": "Pregunta de compatibilidad de licencias entre municipios: es el problema real que tiene el propio TFM al publicar el banco, planteado como pregunta de evaluación. Impone además un requisito al diseño de `buscar_datasets` (TODO 3.4): la herramienta tiene que devolver el total de coincidencias, no solo la primera página, o el conteo es inalcanzable sin paginar a ciegas. Recuento de Barcelona verificado por `nombre LIKE '%mapa-estrategic-soroll%'` (6); búsqueda de «mapa estratégico de ruido» en Barcelona: 0 resultados.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset WHERE portal_id='malaga' AND lower(titulo) LIKE '%mapa estrat%ruido%'\"",
+          "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset WHERE portal_id='barcelona' AND nombre LIKE '%mapa-estrategic-soroll%'\"",
+          "python3 -m tfm.index buscar 'mapa estrategico de ruido' --portal barcelona --limite 5"
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-009",
+      "pregunta": "¿De qué entidades municipales publica Reus el presupuesto inicial de gastos?",
+      "dificultad": "media",
+      "tipo": "monociudad",
+      "ciudades": ["reus"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "reus",
+          "identificador": "2405134b-2af3-47b5-9cab-1cfb42b8a894",
+          "url_origen": "https://opendata.reus.cat/dataset/pressupost-inicial-de-despesa-de-l-ajuntament-de-reus",
+          "titulo": "Pressupost inicial de despesa de l’Ajuntament de Reus",
+          "rol": "principal"
+        },
+        {
+          "portal": "reus",
+          "identificador": "8f3ab10d-bc5a-418f-b623-a8cb66756e50",
+          "url_origen": "https://opendata.reus.cat/dataset/pressupost-inicial-de-despesa-de-l-agencia-de-promocio-de-ciutat",
+          "titulo": "Pressupost inicial de despesa de l’Agència de Promoció de Ciutat",
+          "rol": "principal"
+        },
+        {
+          "portal": "reus",
+          "identificador": "a23c2576-06ad-41ef-b726-2e39a9a46121",
+          "url_origen": "https://opendata.reus.cat/dataset/pressupost-inicial-de-despesa-de-l-institut-municipal-reus-cultura",
+          "titulo": "Pressupost inicial de despesa de l’Institut Municipal Reus Cultura",
+          "rol": "principal"
+        },
+        {
+          "portal": "reus",
+          "identificador": "7255a2e8-af2d-4502-96bf-d7992d2c901e",
+          "url_origen": "https://opendata.reus.cat/dataset/pressupost-inicial-de-despesa-de-l-institut-municipal-de-formacio-i-empresa-imfe",
+          "titulo": "Pressupost inicial de despesa de l’Institut Municipal de Formació i Empresa (IMFE)",
+          "rol": "principal"
+        },
+        {
+          "portal": "reus",
+          "identificador": "66129e8f-02b0-49ed-87f9-59b6a598299a",
+          "url_origen": "https://opendata.reus.cat/dataset/pressupost-inicial-de-despesa-del-teatre-bartrina",
+          "titulo": "Pressupost inicial de despesa del Teatre Bartrina",
+          "rol": "principal"
+        },
+        {
+          "portal": "reus",
+          "identificador": "02e51834-494e-4dd4-a3aa-1046ded87547",
+          "url_origen": "https://opendata.reus.cat/dataset/pressupost-inicial-de-despesa-del-teatre-fortuny",
+          "titulo": "Pressupost inicial de despesa del Teatre Fortuny",
+          "rol": "principal"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "presupuesto inicial de gastos", "ciudad": "reus" },
+          "obligatoria": false,
+          "resultado_esperado": "vacio",
+          "nota": "La consulta en castellano no devuelve nada en el catálogo de Reus."
+        },
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "pressupost inicial despesa", "ciudad": "reus", "limite": 10 },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "Reus publica el presupuesto inicial de gastos («pressupost inicial de despesa») de seis entidades: el propio Ajuntament de Reus, la Agència de Promoció de Ciutat, el Institut Municipal Reus Cultura, el Institut Municipal de Formació i Empresa (IMFE), el Teatre Bartrina y el Teatre Fortuny. Cada uno es un conjunto independiente con 9 distribuciones y licencia CC-BY; hay series paralelas de previsión de ingresos y de seguimiento presupuestario. Todo el catálogo está en catalán, así que la consulta hay que hacerla con «pressupost» y «despesa».",
+      "criterios_respuesta": [
+        "Enumera las seis entidades",
+        "Menciona que el catálogo está en catalán y que la consulta hay que reformularla",
+        "Incluye al menos una URL de opendata.reus.cat",
+        "NO: presenta como entidades presupuestarias organismos que no aparecen en el catálogo"
+      ],
+      "etiquetas": ["multilingue", "agregacion", "reintento-de-consulta", "conteo"],
+      "notas_anotador": "Segundo caso de barrera lingüística, esta vez sin rescate por prefijo: `buscar 'presupuesto' --portal reus` devuelve 0. Además exige agregar seis resultados en una respuesta, no devolver el primero. Reus es el mejor caso de calidad del corpus (78/100 con calidad 54,4) y aun así es el más difícil de consultar en castellano: es el argumento de que calidad de metadatos y accesibilidad para un agente no son lo mismo.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "python3 -m tfm.index buscar 'presupuesto' --portal reus --limite 5",
+          "sqlite3 datos/indice.sqlite \"SELECT identificador_origen, titulo FROM dataset WHERE portal_id='reus' AND titulo LIKE 'Pressupost inicial de despesa%'\""
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-010",
+      "pregunta": "Necesito los datos de calidad del aire de Málaga del año 2024. ¿Dónde los descargo?",
+      "dificultad": "media",
+      "tipo": "monociudad",
+      "ciudades": ["malaga"],
+      "sin_respuesta": true,
+      "motivo_sin_respuesta": "periodo_inexistente",
+      "datasets_referencia": [],
+      "datasets_proximos": [
+        {
+          "portal": "malaga",
+          "identificador": "6610fb1b-96c7-466b-8555-478a026df70a",
+          "url_origen": "https://datosabiertos.malaga.eu/dataset/calidad-del-aire-2018",
+          "titulo": "Calidad del aire 2018",
+          "rol": "secundario"
+        },
+        {
+          "portal": "malaga",
+          "identificador": "7ca590a4-ca9d-4a28-ad60-8f8e89c3c005",
+          "url_origen": "https://datosabiertos.malaga.eu/dataset/calidad-del-aire-2017",
+          "titulo": "Calidad del aire 2017",
+          "rol": "secundario"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "calidad del aire", "ciudad": "malaga", "anio": 2024 },
+          "obligatoria": false,
+          "resultado_esperado": "vacio"
+        },
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "calidad del aire", "ciudad": "malaga" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "comprobaciones_vacias": [
+        { "consulta": "calidad del aire 2024", "ciudad": "malaga" },
+        { "consulta": "calidad del aire 2025", "ciudad": "malaga" },
+        { "consulta": "contaminacion atmosferica", "ciudad": "malaga" }
+      ],
+      "respuesta_referencia": "No existen. El portal de Málaga solo publica dos conjuntos de calidad del aire, «Calidad del aire 2017» y «Calidad del aire 2018»; el más reciente se modificó por última vez el 02/01/2019, así que la serie lleva congelada desde entonces y no hay datos de 2024. Para ese año habría que acudir a la Red de Vigilancia y Control de la Calidad del Aire de la Junta de Andalucía, que está fuera de este catálogo municipal.",
+      "criterios_respuesta": [
+        "Afirma con claridad que no hay datos de calidad del aire de 2024 en el portal de Málaga",
+        "Menciona que lo más reciente disponible es 2018",
+        "NO: ofrece un dataset de 2024 o una URL construida a partir del patrón calidad-del-aire-AAAA",
+        "NO: presenta «Calidad del aire 2018» como si respondiera a lo preguntado"
+      ],
+      "etiquetas": ["sin-respuesta", "alucinacion", "frescura", "procedencia"],
+      "notas_anotador": "Ausencia temporal, no temática: el tema existe y la serie no llega al año pedido. Es la alucinación más fácil de provocar, porque las URL de Málaga siguen un patrón evidente (`/dataset/calidad-del-aire-AAAA`) y basta con cambiar el año para fabricar un enlace verosímil y roto. Los cuasi-aciertos van en `datasets_proximos`: ofrecerlos es correcto, presentarlos como la respuesta no. Cifra de apoyo del cap. 3: Málaga solo tiene el 16 % del catálogo actualizado en 12 meses, con antigüedad mediana de 1.541 días.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "python3 -m tfm.index buscar 'calidad del aire' --portal malaga --limite 10",
+          "sqlite3 datos/indice.sqlite \"SELECT titulo, fecha_modificacion_origen FROM dataset WHERE portal_id='malaga' AND lower(titulo) LIKE '%calidad del aire%'\""
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-011",
+      "pregunta": "¿Qué ciudades del corpus publican la ubicación de los puntos de wifi público municipal, y en qué condiciones puedo reutilizar cada uno?",
+      "dificultad": "dificil",
+      "tipo": "multiciudad",
+      "ciudades": ["madrid", "barcelona", "malaga", "cordoba", "reus"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "madrid",
+          "identificador": "216619-0-wifi-municipal",
+          "url_origen": "https://datos.madrid.es/dataset/216619-0-wifi-municipal",
+          "titulo": "Instalaciones municipales con zonas wifi gratuitas",
+          "rol": "principal"
+        },
+        {
+          "portal": "barcelona",
+          "identificador": "66f47f79-0a05-4fdc-8621-f84f8140a138",
+          "url_origen": "https://opendata-ajuntament.barcelona.cat/data/dataset/punts-wifi",
+          "titulo": "Wifi hotspots of the city of Barcelona",
+          "rol": "principal"
+        },
+        {
+          "portal": "malaga",
+          "identificador": "4ed2b759-cc35-4e9f-bdfb-5c3d292ae4e8",
+          "url_origen": "https://datosabiertos.malaga.eu/dataset/sedes-wifi-municipales",
+          "titulo": "Sedes Wifi Municipales",
+          "rol": "principal"
+        },
+        {
+          "portal": "cordoba",
+          "identificador": "4c066bf6-2455-4219-b5f4-87c626ac4719",
+          "url_origen": "https://datosabiertos.cordoba.es/dataset/puntos-wifi",
+          "titulo": "Puntos Wifi",
+          "rol": "principal"
+        },
+        {
+          "portal": "reus",
+          "identificador": "17ad2087-23ce-4c5b-9c3d-d5af18517613",
+          "url_origen": "https://opendata.reus.cat/dataset/wi-fi",
+          "titulo": "Wi-Fi",
+          "rol": "principal"
+        },
+        {
+          "portal": "reus",
+          "identificador": "c2fc9fc2-0221-481c-be5e-b9d2da0ab790",
+          "url_origen": "https://opendata.reus.cat/dataset/connexions-i-usuaris-xarxa-publica-reus-wifi",
+          "titulo": "Connexions i usuaris xarxa pública Reus WIFI",
+          "rol": "secundario"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "comparar_ciudades",
+          "argumentos": {
+            "tema": "wifi público municipal",
+            "ciudades": ["madrid", "barcelona", "malaga", "cordoba", "reus"]
+          },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        },
+        {
+          "herramienta": "listar_distribuciones",
+          "argumentos": { "id": "cordoba:4c066bf6-2455-4219-b5f4-87c626ac4719" },
+          "obligatoria": false,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "Las cinco ciudades del corpus publican puntos de wifi público, pero en condiciones muy distintas. Madrid: «Instalaciones municipales con zonas wifi gratuitas» (4 distribuciones: CSV, PDF y 2 XLSX), CC-BY. Barcelona: «Wifi hotspots of the city of Barcelona» (18 distribuciones: CSV, JSON y 16 ZIP), CC-BY-4.0, con la ficha modificada por última vez en 2013. Málaga: «Sedes Wifi Municipales» (10 distribuciones en CSV, GeoJSON, GML, KML y SHP), CC BY-SA 4.0, que obliga a compartir igual cualquier derivado. Córdoba: «Puntos Wifi» (1 distribución CSV) **sin licencia declarada**, por lo que sus condiciones de reutilización son desconocidas. Reus: «Wi-Fi» (1 distribución CSV), CC-BY, además de la serie de conexiones y usuarios de la red pública. Conclusión práctica: se pueden combinar los cinco solo si el resultado se publica como compartir igual y se resuelve antes la situación del conjunto de Córdoba.",
+      "criterios_respuesta": [
+        "Cubre las cinco ciudades del corpus",
+        "Indica que el conjunto de Córdoba no declara licencia",
+        "Indica que el de Málaga es CC BY-SA (compartir igual)",
+        "Da al menos un formato por ciudad",
+        "NO: presenta el conjunto de Córdoba como CC-BY o como reutilizable sin condiciones"
+      ],
+      "etiquetas": [
+        "multiciudad",
+        "comparacion",
+        "licencia",
+        "licencia-no-declarada",
+        "licencia-compartir-igual",
+        "formatos",
+        "procedencia"
+      ],
+      "notas_anotador": "Pregunta multiciudad completa y el caso de uso que justifica `comparar_ciudades`. Es difícil por tres motivos acumulados: cada portal nombra el concepto de forma distinta («Instalaciones municipales con zonas wifi gratuitas», «Wifi hotspots», «Sedes Wifi Municipales», «Puntos Wifi», «Wi-Fi»), en Reus la búsqueda por «wifi» devuelve antes los datasets de uso que el de ubicación, y la respuesta correcta exige razonar sobre la compatibilidad de tres regímenes de licencia distintos. La ausencia de licencia en Córdoba es el punto donde más se juega la honestidad del agente.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "sqlite3 datos/indice.sqlite \"SELECT portal_id, titulo, num_distribuciones FROM dataset WHERE lower(titulo) LIKE '%wifi%' OR lower(titulo) LIKE '%wi-fi%' ORDER BY portal_id\""
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-012",
+      "pregunta": "Quiero comparar el arbolado urbano de las cinco ciudades del corpus. ¿Cuáles publican inventario de árboles y cuáles no?",
+      "dificultad": "dificil",
+      "tipo": "multiciudad",
+      "ciudades": ["madrid", "barcelona", "malaga", "cordoba", "reus"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "madrid",
+          "identificador": "300264-0-arbolado-parques-historico",
+          "url_origen": "https://datos.madrid.es/dataset/300264-0-arbolado-parques-historico",
+          "titulo": "Arbolado en parques y zonas verdes de Madrid",
+          "rol": "principal"
+        },
+        {
+          "portal": "madrid",
+          "identificador": "300761-0-arbolado-especies",
+          "url_origen": "https://datos.madrid.es/dataset/300761-0-arbolado-especies",
+          "titulo": "Arbolado en parques y zonas verdes de Madrid (detalle)",
+          "rol": "secundario"
+        },
+        {
+          "portal": "barcelona",
+          "identificador": "27b3f8a7-e536-4eea-b025-ce094817b2bd",
+          "url_origen": "https://opendata-ajuntament.barcelona.cat/data/dataset/arbrat-viari",
+          "titulo": "Street trees of the city of Barcelona",
+          "rol": "principal"
+        },
+        {
+          "portal": "barcelona",
+          "identificador": "99ce00b1-36ab-4e06-b1bc-c60c5f7a811d",
+          "url_origen": "https://opendata-ajuntament.barcelona.cat/data/dataset/arbrat-parcs",
+          "titulo": "Trees in the parks of the city of Barcelona",
+          "rol": "secundario"
+        },
+        {
+          "portal": "cordoba",
+          "identificador": "dbebc62e-1dd3-4cd9-8076-c01d7fe6ace0",
+          "url_origen": "https://datosabiertos.cordoba.es/dataset/arbolado",
+          "titulo": "Arbolado",
+          "rol": "principal"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "comparar_ciudades",
+          "argumentos": {
+            "tema": "arbolado urbano",
+            "ciudades": ["madrid", "barcelona", "malaga", "cordoba", "reus"]
+          },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        },
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "arbrat", "ciudad": "barcelona" },
+          "obligatoria": false,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "Solo tres de las cinco. Madrid publica «Arbolado en parques y zonas verdes de Madrid» (107 distribuciones) y su versión de detalle por especies (9). Barcelona publica tres conjuntos bajo el nombre catalán «arbrat»: viario (94 distribuciones), de parques (46) y de zona (90), con los títulos en inglés en el catálogo. Córdoba publica «Arbolado», un único conjunto con una sola distribución. Málaga y Reus **no publican ningún inventario de arbolado** en la instantánea del 25/07/2026: en Reus se revisaron los 119 datasets del catálogo y en Málaga no hay ninguna coincidencia ni por título ni por palabra clave. Una comparación entre las cinco ciudades, por tanto, no es posible: como mucho puede hacerse entre tres, y con granularidades muy distintas.",
+      "criterios_respuesta": [
+        "Dice que Madrid, Barcelona y Córdoba sí publican inventario de arbolado",
+        "Dice explícitamente que Málaga y Reus no lo publican",
+        "Advierte de que la comparación entre las cinco ciudades no es posible",
+        "NO: atribuye a Málaga o a Reus un dataset de arbolado"
+      ],
+      "etiquetas": [
+        "multiciudad",
+        "comparacion",
+        "ausencia-parcial",
+        "alucinacion",
+        "multilingue",
+        "heterogeneidad"
+      ],
+      "notas_anotador": "Ausencia parcial: la trampa es que la pregunta presupone que las cinco publican el dato, y el modelo complaciente rellena los huecos. Verificado con dos vías independientes en Málaga y Reus (LIKE sobre título y descripción, y tabla `keyword`): cero coincidencias. La única keyword «arbolado» del índice pertenece a Madrid, y las «Arbrat*» a Barcelona. Nótese además la disparidad de granularidad: Córdoba resuelve con un fichero lo que Madrid despliega en 107 distribuciones; decirlo forma parte de una buena respuesta aunque no sea criterio obligatorio.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "sqlite3 datos/indice.sqlite \"SELECT portal_id, count(*) FROM dataset WHERE lower(titulo) LIKE '%arbol%' OR lower(titulo) LIKE '%arbrat%' OR lower(titulo) LIKE '%tree%' GROUP BY portal_id\"",
+          "sqlite3 datos/indice.sqlite \"SELECT DISTINCT d.portal_id, k.texto FROM keyword k JOIN dataset_keyword dk ON dk.keyword_id=k.id JOIN dataset d ON d.id=dk.dataset_id WHERE k.normalizado LIKE '%arbol%' OR k.normalizado LIKE '%arbr%'\""
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-013",
+      "pregunta": "Quiero descargar en CSV la serie de calidad del aire de Córdoba para analizarla. ¿Puedo?",
+      "dificultad": "dificil",
+      "tipo": "monociudad",
+      "ciudades": ["cordoba"],
+      "sin_respuesta": false,
+      "datasets_referencia": [
+        {
+          "portal": "cordoba",
+          "identificador": "75add831-88c2-4677-b5fd-99bc4f190490",
+          "url_origen": "https://datosabiertos.cordoba.es/dataset/calidad-del-aire",
+          "titulo": "Calidad del aire",
+          "rol": "principal"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "calidad del aire", "ciudad": "cordoba" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        },
+        {
+          "herramienta": "listar_distribuciones",
+          "argumentos": { "id": "cordoba:75add831-88c2-4677-b5fd-99bc4f190490" },
+          "obligatoria": true,
+          "resultado_esperado": "con_resultados"
+        }
+      ],
+      "respuesta_referencia": "No, en CSV no. El conjunto «Calidad del aire» del portal de Córdoba (https://datosabiertos.cordoba.es/dataset/calidad-del-aire) existe, pero tiene una sola distribución de formato HTML, y no apunta a un fichero del Ayuntamiento sino a una página de informes de la Consejería de Medio Ambiente de la Junta de Andalucía. Es decir, el catálogo enlaza a un tercero en lugar de publicar el dato. Además el conjunto no declara licencia, como los 145 del portal. Si necesitas la serie en CSV tendrás que obtenerla de la Red de Vigilancia y Control de la Calidad del Aire de la Junta de Andalucía, fuera de este catálogo. El caso es representativo de Córdoba: 1.674 de sus 2.013 distribuciones son PDF (83 %).",
+      "criterios_respuesta": [
+        "Responde que no hay CSV disponible",
+        "Indica que la única distribución es de formato HTML",
+        "Señala que el enlace apunta a la Junta de Andalucía y no al Ayuntamiento",
+        "Menciona que el conjunto no declara licencia",
+        "NO: afirma que existe una distribución en CSV, XLSX o JSON"
+      ],
+      "etiquetas": [
+        "cordoba-peor-caso",
+        "formatos",
+        "procedencia",
+        "licencia-no-declarada",
+        "alucinacion"
+      ],
+      "notas_anotador": "Existe el dataset y existe el tema, pero no existe el dato descargable: la respuesta correcta es negativa aunque `buscar_datasets` devuelva un resultado. Es el escenario donde un agente optimista falla peor, porque la primera herramienta ya le da un «éxito». Obliga a llegar a `listar_distribuciones` para responder. Verificado: única distribución con `formato = 'HTML'` y `url_descarga` en juntadeandalucia.es. Es el ejemplo más claro de por qué el TFM llama a Córdoba «portal de transparencia disfrazado de portal de datos abiertos» (cap. 3).",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "sqlite3 datos/indice.sqlite \"SELECT formato, url_descarga FROM distribucion WHERE dataset_id=(SELECT id FROM dataset WHERE identificador_origen='75add831-88c2-4677-b5fd-99bc4f190490')\"",
+          "sqlite3 datos/indice.sqlite \"SELECT formato, count(*) FROM distribucion di JOIN dataset d ON d.id=di.dataset_id WHERE d.portal_id='cordoba' GROUP BY formato ORDER BY 2 DESC\""
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-014",
+      "pregunta": "¿Dónde está el inventario de arbolado urbano del Ayuntamiento de Reus?",
+      "dificultad": "dificil",
+      "tipo": "monociudad",
+      "ciudades": ["reus"],
+      "sin_respuesta": true,
+      "motivo_sin_respuesta": "tema_inexistente_en_la_ciudad",
+      "datasets_referencia": [],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "arbolado", "ciudad": "reus" },
+          "obligatoria": true,
+          "resultado_esperado": "vacio"
+        },
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "arbrat arbres", "ciudad": "reus" },
+          "obligatoria": false,
+          "resultado_esperado": "vacio"
+        }
+      ],
+      "comprobaciones_vacias": [
+        { "consulta": "arbolado", "ciudad": "reus" },
+        { "consulta": "arbrat", "ciudad": "reus" },
+        { "consulta": "arbres", "ciudad": "reus" },
+        { "consulta": "zones verdes", "ciudad": "reus" }
+      ],
+      "respuesta_referencia": "No existe. El catálogo de Reus tiene 119 conjuntos de datos y ninguno es un inventario de arbolado: no hay coincidencias ni buscando en castellano («arbolado») ni en catalán («arbrat», «arbres», «zones verdes»), ni por título ni por palabras clave. Reus sí publica otros datos de vía pública y medio ambiente —contenedores, recogida de residuos, calidad del aire y ruido, consumo de agua por barrios—, pero el arbolado no está entre ellos. Si el inventario de arbolado es imprescindible, sí lo publican Madrid, Barcelona y Córdoba.",
+      "criterios_respuesta": [
+        "Afirma con claridad que Reus no publica inventario de arbolado",
+        "Menciona que se comprobó también con la denominación catalana",
+        "NO: devuelve un dataset de Reus como si fuera el inventario de arbolado",
+        "NO: inventa una URL de opendata.reus.cat para el arbolado"
+      ],
+      "etiquetas": ["sin-respuesta", "alucinacion", "multilingue", "procedencia"],
+      "notas_anotador": "Ausencia temática pura. Es la pareja de bdam-es-005 (Madrid sí) y la variante monociudad de bdam-es-012. Doble dificultad: el modelo tiene que descartar que el fallo sea de idioma antes de concluir que el dato no existe, que es exactamente el error contrario al de bdam-es-006 y bdam-es-009. Ofrecer las ciudades que sí lo publican es correcto y deseable, pero no sustituye a decir que Reus no lo tiene. Comprobado sobre los 119 títulos completos del catálogo, no solo por búsqueda.",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "python3 -m tfm.index buscar 'arbolado' --portal reus --limite 5",
+          "python3 -m tfm.index buscar 'arbrat' --portal reus --limite 5",
+          "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset WHERE portal_id='reus' AND lower(titulo||' '||descripcion) GLOB '*arb*'\""
+        ]
+      }
+    },
+
+    {
+      "id": "bdam-es-015",
+      "pregunta": "¿Qué publica el Ayuntamiento de Córdoba sobre los precios del alquiler de vivienda en la ciudad?",
+      "dificultad": "dificil",
+      "tipo": "monociudad",
+      "ciudades": ["cordoba"],
+      "sin_respuesta": true,
+      "motivo_sin_respuesta": "tema_inexistente_en_la_ciudad",
+      "datasets_referencia": [],
+      "datasets_proximos": [
+        {
+          "portal": "cordoba",
+          "identificador": "7a46584a-568b-4670-b769-56c747405332",
+          "url_origen": "https://datosabiertos.cordoba.es/dataset/concesiones-de-ayudas-y-subvenciones-de-vimcorsa",
+          "titulo": "Concesiones de ayudas y subvenciones de VIMCORSA",
+          "rol": "secundario"
+        },
+        {
+          "portal": "cordoba",
+          "identificador": "c2604806-9d05-4a39-8774-0b5f44cbef74",
+          "url_origen": "https://datosabiertos.cordoba.es/dataset/transparencia-vimcorsa",
+          "titulo": "Portal de Transparencia de VIMCORSA",
+          "rol": "secundario"
+        }
+      ],
+      "traza_esperada": [
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "alquiler vivienda", "ciudad": "cordoba" },
+          "obligatoria": true,
+          "resultado_esperado": "vacio"
+        },
+        {
+          "herramienta": "buscar_datasets",
+          "argumentos": { "consulta": "vivienda", "ciudad": "cordoba" },
+          "obligatoria": false,
+          "resultado_esperado": "vacio"
+        }
+      ],
+      "comprobaciones_vacias": [
+        { "consulta": "alquiler vivienda", "ciudad": "cordoba" },
+        { "consulta": "precio vivienda", "ciudad": "cordoba" },
+        { "consulta": "mercado inmobiliario", "ciudad": "cordoba" }
+      ],
+      "respuesta_referencia": "El portal de datos abiertos de Córdoba no publica nada sobre precios del alquiler: no hay ningún conjunto que mencione «alquiler» o «vivienda» en su título o descripción. Lo más cercano son conjuntos de VIMCORSA, la empresa municipal de vivienda —«Concesiones de ayudas y subvenciones de VIMCORSA» y su portal de transparencia—, pero se refieren a subvenciones y a información institucional, no a precios ni a mercado de alquiler. Ninguno de ellos declara licencia, como el resto del portal. Para precios de alquiler habría que acudir a fuentes ajenas a este catálogo (INE, Ministerio de Vivienda o portales privados).",
+      "criterios_respuesta": [
+        "Afirma que Córdoba no publica datos de precios del alquiler",
+        "Distingue los conjuntos de VIMCORSA como cuasi-aciertos que no responden a lo preguntado",
+        "NO: presenta un dataset de VIMCORSA como fuente de precios de alquiler",
+        "NO: inventa un conjunto de precios de vivienda en datosabiertos.cordoba.es"
+      ],
+      "etiquetas": [
+        "sin-respuesta",
+        "alucinacion",
+        "cordoba-peor-caso",
+        "licencia-no-declarada"
+      ],
+      "notas_anotador": "Sin respuesta con cuasi-acierto fuerte: existe la empresa municipal de vivienda y existen sus datasets, así que el modelo tiene material verosímil con el que construir una respuesta falsa sin inventarse ninguna URL. Es el caso más exigente de los tres sin respuesta y el que mejor separa «no encontré nada» de «no lo dice el dato». Verificado con LIKE sobre título y descripción de los 145 datasets: cero coincidencias con «alquiler» y con «vivienda».",
+      "anotador": "A1",
+      "fecha_anotacion": "2026-07-25",
+      "verificacion": {
+        "metodo": "indice-local",
+        "fecha": "2026-07-25",
+        "comandos": [
+          "python3 -m tfm.index buscar 'alquiler vivienda' --portal cordoba --limite 5",
+          "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset WHERE portal_id='cordoba' AND (lower(titulo||' '||descripcion) LIKE '%alquiler%' OR lower(titulo||' '||descripcion) LIKE '%vivienda%')\""
+        ]
+      }
+    }
+  ]
+}
