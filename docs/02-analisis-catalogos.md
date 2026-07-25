@@ -371,18 +371,32 @@ Esto es lo que hay que llevar a la reunión de septiembre con Óscar.
 
 **Lo que sigue siendo tuyo y nadie ha hecho:**
 
+> ⚠️ **Estas cuatro afirmaciones se verificaron una a una en
+> [docs/03-prior-art.md](03-prior-art.md) §4, y la tercera resultó FALSA.** Se conservan aquí
+> tal como se escribieron, con la corrección al lado, porque el recorrido importa: es lo que
+> hay que llevar a la reunión. Vale la versión de `03-prior-art.md`, no esta.
+
 1. **El banco de evaluación en español.** Búsqueda hecha: no existe un benchmark en español de
    preguntas sobre catálogos de datos abiertos con respuestas de referencia y trazas de
    herramientas. Los benchmarks de tool-calling (ToolBench, API-Bank, FlowBench) son genéricos y
    en inglés. **Esta es ahora la contribución principal, no la secundaria.**
+   → *Sobrevive, reformulado.*
 2. **La pregunta de investigación del modelo pequeño en el navegador.** Ningún proyecto de los
    anteriores la responde; todos asumen un modelo grande en la nube. Sigue intacta.
-3. **La capa multiciudad municipal.** Lo existente es o nacional (datos.gob.es, que empobrece
+   → *Sobrevive a medias.*
+3. ~~**La capa multiciudad municipal.** Lo existente es o nacional (datos.gob.es, que empobrece
    metadatos) o mono-ciudad (Zúrich). El eje **comparación entre municipios sobre metadatos
-   heterogéneos** —con la evidencia de heterogeneidad de §2 y §5— no está cubierto.
+   heterogéneos** no está cubierto.~~
+   → **REFUTADA.** `xaviviro/Opendata.cat-MCP-Server` (21★, último *push* 15/07/2026) es
+   multi-portal municipal, está desplegado, agrega 15 portales catalanes con >3.000 datasets con
+   cosecha semanal, e **incluye Barcelona y Reus, dos de las cinco ciudades del corpus**. Y
+   `ondata/ckan-mcp-server` resuelve el eje multi-portal de forma genérica con `server_url` por
+   llamada. Lo que sigue libre es mucho más estrecho: **medir** si el LLM compara bien, y
+   caracterizar la heterogeneidad en vez de ocultarla normalizándola.
 4. **La caracterización empírica del ecosistema municipal español.** Los números de este
    documento (frescura, licencias, link rot, inflación de catálogo, huecos de federación) no
    están publicados en ningún sitio que haya encontrado.
+   → *Sobrevive, estrechando la afirmación.*
 
 **Reformulación sugerida del TFM.** De *"construyo un servidor MCP para catálogos DCAT"* a
 *"¿cuánto de la dificultad de consultar datos abiertos municipales es del modelo y cuánto de

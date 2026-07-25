@@ -26,7 +26,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
 > planteamiento: el servidor MCP ya no es la contribución, es el instrumento. Esta fase existe
 > para que esa reformulación quede acordada por escrito con el director, no asumida.
 
-- [ ] **0.1 — Leer el prior art antes de escribir una línea propia**
+- [x] **0.1 — Leer el prior art antes de escribir una línea propia** ✅ 25/07/2026
   Código del MCP de datos.gob.es (`Admindatosgobes/Laboratorio-de-Datos`), `mjanez/ckan-mcp-server`
   y `malkreide/zurich-opendata-mcp`. Interesa qué herramientas exponen, cómo modelan los
   argumentos y qué hacen cuando el portal falla.
@@ -37,7 +37,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
     y cuáles no.
   - Una decisión escrita y justificada: *fork*, *dependencia*, o reimplementación.
 
-- [ ] **0.2 — Verificar qué es "Madrid Agentic City" y `cibelex-mcp`**
+- [x] **0.2 — Verificar qué es "Madrid Agentic City" y `cibelex-mcp`** ✅ 25/07/2026
   Aparecen en la organización GitHub del Ayuntamiento de Madrid. Puede ser prior art directo
   sobre la ciudad de mayor puntuación del corpus, o una vía de colaboración.
   **DONE IS:**
