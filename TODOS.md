@@ -129,7 +129,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
     DCAT-AP-ES?, ¿qué campos obligatorios faltan?).
   - Validación ejecutada con una herramienta reproducible, no a ojo.
 
-- [ ] **2.3 — Corregir los datos de población**
+- [x] **2.3 — Corregir los datos de población** ✅ 25/07/2026
   En la rúbrica están puestos de memoria.
   **DONE IS:** poblaciones tomadas del padrón INE con URL y año en `research/score.py`;
   puntuaciones recalculadas y la tabla del cap. 3 actualizada.

@@ -1,0 +1,205 @@
+{
+ "_fuente": {
+  "organismo": "Instituto Nacional de Estadística (INE)",
+  "operacion": "Cifras Oficiales de Población de los Municipios Españoles: Revisión del Padrón Municipal (DPOP, cód. IOE 30245)",
+  "tabla": "29005 — Cifras oficiales del padrón por municipio",
+  "periodo": "Población a 1 de enero de 2025 (revisión del padrón vigente en la fecha de consulta)",
+  "anyo": 2025,
+  "sexo": "Total (ambos sexos)",
+  "url_tabla": "https://www.ine.es/jaxiT3/Tabla.htm?t=29005",
+  "url_api_plantilla": "https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/29005?tv=19:{id_ine}&tv=18:451&nult=1",
+  "fecha_consulta": "2026-07-25",
+  "nota": "Los 27 valores proceden de la MISMA tabla y del MISMO año. 'id_ine' es el identificador interno del municipio en la API Tempus3 (VALORES_GRUPOSTABLA/29005/89616); 'cod_ine' es el código municipal INE de 5 dígitos."
+ },
+ "municipios": {
+  "Madrid": {
+   "nombre_ine": "Madrid",
+   "cod_ine": "28079",
+   "id_ine": 2813,
+   "serie": "DPOP13156",
+   "poblacion": 3506730
+  },
+  "Barcelona": {
+   "nombre_ine": "Barcelona",
+   "cod_ine": "08019",
+   "id_ine": 563,
+   "serie": "DPOP2665",
+   "poblacion": 1731649
+  },
+  "Valencia": {
+   "nombre_ine": "València",
+   "cod_ine": "46250",
+   "id_ine": 493,
+   "serie": "DPOP21796",
+   "poblacion": 840792
+  },
+  "Zaragoza": {
+   "nombre_ine": "Zaragoza",
+   "cod_ine": "50297",
+   "id_ine": 494,
+   "serie": "DPOP24472",
+   "poblacion": 693091
+  },
+  "Malaga": {
+   "nombre_ine": "Málaga",
+   "cod_ine": "29067",
+   "id_ine": 485,
+   "serie": "DPOP13663",
+   "poblacion": 599063
+  },
+  "Palmas_GC": {
+   "nombre_ine": "Palmas de Gran Canaria, Las",
+   "cod_ine": "35016",
+   "id_ine": 1433,
+   "serie": "DPOP15862",
+   "poblacion": 381868
+  },
+  "Bilbao": {
+   "nombre_ine": "Bilbao",
+   "cod_ine": "48020",
+   "id_ine": 8002,
+   "serie": "DPOP22582",
+   "poblacion": 351124
+  },
+  "Cordoba": {
+   "nombre_ine": "Córdoba",
+   "cod_ine": "14021",
+   "id_ine": 4725,
+   "serie": "DPOP6238",
+   "poblacion": 323262
+  },
+  "Vigo": {
+   "nombre_ine": "Vigo",
+   "cod_ine": "36057",
+   "id_ine": 6575,
+   "serie": "DPOP16090",
+   "poblacion": 294489
+  },
+  "Gijon": {
+   "nombre_ine": "Gijón",
+   "cod_ine": "33024",
+   "id_ine": 6338,
+   "serie": "DPOP15073",
+   "poblacion": 269894
+  },
+  "Vitoria": {
+   "nombre_ine": "Vitoria-Gasteiz",
+   "cod_ine": "01059",
+   "id_ine": 571,
+   "serie": "DPOP139",
+   "poblacion": 260699
+  },
+  "Terrassa": {
+   "nombre_ine": "Terrassa",
+   "cod_ine": "08279",
+   "id_ine": 5426,
+   "serie": "DPOP3439",
+   "poblacion": 233270
+  },
+  "SCTenerife": {
+   "nombre_ine": "Santa Cruz de Tenerife",
+   "cod_ine": "38038",
+   "id_ine": 6827,
+   "serie": "DPOP17311",
+   "poblacion": 211957
+  },
+  "Pamplona": {
+   "nombre_ine": "Pamplona/Iruña",
+   "cod_ine": "31201",
+   "id_ine": 6208,
+   "serie": "DPOP14506",
+   "poblacion": 209094
+  },
+  "Donostia": {
+   "nombre_ine": "Donostia/San Sebastián",
+   "cod_ine": "20069",
+   "id_ine": 572,
+   "serie": "DPOP9655",
+   "poblacion": 189866
+  },
+  "Santander": {
+   "nombre_ine": "Santander",
+   "cod_ine": "39075",
+   "id_ine": 489,
+   "serie": "DPOP17584",
+   "poblacion": 175425
+  },
+  "Alcobendas": {
+   "nombre_ine": "Alcobendas",
+   "cod_ine": "28006",
+   "id_ine": 2784,
+   "serie": "DPOP12940",
+   "poblacion": 123342
+  },
+  "Reus": {
+   "nombre_ine": "Reus",
+   "cod_ine": "43123",
+   "id_ine": 7319,
+   "serie": "DPOP19534",
+   "poblacion": 111601
+  },
+  "Lorca": {
+   "nombre_ine": "Lorca",
+   "cod_ine": "30024",
+   "id_ine": 2545,
+   "serie": "DPOP13837",
+   "poblacion": 98969
+  },
+  "Caceres": {
+   "nombre_ine": "Cáceres",
+   "cod_ine": "10037",
+   "id_ine": 5075,
+   "serie": "DPOP4771",
+   "poblacion": 96651
+  },
+  "Torrent": {
+   "nombre_ine": "Torrent",
+   "cod_ine": "46244",
+   "id_ine": 16550,
+   "serie": "DPOP21778",
+   "poblacion": 90928
+  },
+  "SantBoi": {
+   "nombre_ine": "Sant Boi de Llobregat",
+   "cod_ine": "08200",
+   "id_ine": 5376,
+   "serie": "DPOP3202",
+   "poblacion": 85610
+  },
+  "Aviles": {
+   "nombre_ine": "Avilés",
+   "cod_ine": "33004",
+   "id_ine": 6325,
+   "serie": "DPOP15013",
+   "poblacion": 75517
+  },
+  "Ponferrada": {
+   "nombre_ine": "Ponferrada",
+   "cod_ine": "24115",
+   "id_ine": 3363,
+   "serie": "DPOP11182",
+   "poblacion": 63186
+  },
+  "Arganda": {
+   "nombre_ine": "Arganda del Rey",
+   "cod_ine": "28014",
+   "id_ine": 3038,
+   "serie": "DPOP12964",
+   "poblacion": 60419
+  },
+  "Alcoi": {
+   "nombre_ine": "Alcoi/Alcoy",
+   "cod_ine": "03009",
+   "id_ine": 6188,
+   "serie": "DPOP451",
+   "poblacion": 61468
+  },
+  "SanLorenzo": {
+   "nombre_ine": "San Lorenzo de El Escorial",
+   "cod_ine": "28131",
+   "id_ine": 2872,
+   "serie": "DPOP13300",
+   "poblacion": 18872
+  }
+ }
+}

@@ -190,40 +190,48 @@ escala logarítmica) + **Calidad 50** (API estándar 15 · % formatos máquina 1
 licencia 5 · completitud de metadatos 6 — dividido entre `%size` y `%descripción` · enlaces
 vivos 6). Implementada en `research/score.py`.
 
-| # | Ciudad | Pobl. | DS | GB | API | Imp/50 | Cal/50 | **Total** | Base |
+**Población:** cifras oficiales del INE, operación *Cifras Oficiales de Población de los
+Municipios Españoles: Revisión del Padrón Municipal* (DPOP, cód. IOE 30245), tabla **29005**
+«Cifras oficiales del padrón por municipio», sexo = Total, **población a 1 de enero de 2025**
+(última revisión publicada). Los 27 valores salen de la misma tabla y del mismo año, con el
+código INE de cada municipio y la serie exacta en `research/data/poblacion_ine.json`.
+Tabla: <https://www.ine.es/jaxiT3/Tabla.htm?t=29005> · API JSON:
+`https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/29005?tv=19:{id}&tv=18:451&nult=1`.
+
+| # | Ciudad | Pobl. (INE 2025) | DS | GB | API | Imp/50 | Cal/50 | **Total** | Base |
 |---|---|---:|---:|---:|---|---:|---:|---:|---|
-| 1 | **Madrid** | 3,4 M | 672 | 262,4 | CKAN+DCAT | 48,5 | 49,7 | **98** | medido |
-| 2 | **Barcelona** | 1,7 M | 555 | 61,7 | CKAN+DCAT | 43,8 | 46,5 | **90** | medido |
-| 3 | Málaga | 596 k | 1.369 | ~10 | CKAN+DCAT | 39,5 | 38,9 | **78** | medido |
-| 4 | Reus | 108 k | 119 | 0,6 | CKAN+DCAT | 23,8 | 54,4 | **78** | medido |
-| 5 | Alcobendas | 120 k | 177 | 0,5 | CKAN+DCAT | 25,5 | 51,1 | **77** | medido |
-| 6 | Terrassa | 227 k | 125 | 0,1 | CKAN+DCAT | 24,8 | 48,7 | **74** | medido |
-| 7 | Avilés | 76 k | 107 | 0,1 | CKAN+DCAT | 21,1 | 51,4 | **72** | medido |
-| 8 | Pamplona | 204 k | 35 | n/d | CKAN+DCAT | 24,3 | 46,2 | **71** | medido |
-| 9 | Arganda del Rey | 60 k | 968 | 1,0 | CKAN+DCAT | 28,2 | 40,5 | **69** | medido |
-| 10 | Alcoy | 59 k | 32 | 5,1 | CKAN+DCAT | 20,2 | 49,0 | **69** | medido |
-| 11 | Sta. Cruz Tenerife | 209 k | 86 | 0,7 | CKAN+DCAT | 26,3 | 42,1 | **68** | medido |
-| 12 | S. Lorenzo Escorial | 19 k | 49 | 0,01 | CKAN+DCAT | 12,5 | 55,7 | **68** | medido |
-| 13 | Torrent | 84 k | 342 | 0,2 | CKAN+DCAT | 24,3 | 39,5 | **64** | medido |
-| 14 | Córdoba | 322 k | 145 | 0,7 | CKAN+DCAT | 29,8 | 31,0 | **61** | medido |
-| 15 | Zaragoza | 690 k | 228 | n/d | REST propio | 30,8 | 26,2 | **57** | inferido |
-| 16 | Valencia | 830 k | 296 | n/d | ArcGIS | 32,0 | 24,2 | **56** | inferido |
-| 17 | Gijón | 270 k | 783 | n/d | REST propio | 29,9 | 26,2 | **56** | inferido |
-| 18 | Ponferrada | 63 k | 29 | 0,01 | CKAN+DCAT | 15,1 | 40,2 | **55** | medido |
-| 19 | Vitoria-Gasteiz | 255 k | 197 | n/d | ficheros | 26,8 | 26,2 | **53** | inferido |
-| 20 | Donostia | 190 k | 108 | n/d | ArcGIS | 24,4 | 28,2 | **53** | inferido |
-| 21 | Las Palmas GC | 381 k | 24 | n/d | ArcGIS | 23,9 | 28,2 | **52** | inferido |
-| 22 | Cáceres | 96 k | 116 | n/d | SPARQL propio | 22,1 | 30,2 | **52** | inferido |
-| 23 | Bilbao | 350 k | 341 | n/d | web | 29,1 | 22,2 | **51** | inferido |
-| 24 | Vigo | 293 k | 148 | n/d | web | 26,7 | 22,2 | **49** | inferido |
-| 25 | Santander | 172 k | 58 | n/d | REST propio | 22,8 | 26,2 | **49** | inferido |
-| 26 | Sant Boi | 82 k | 45 | n/d | ArcGIS Hub | 19,5 | 29,2 | **49** | inferido |
-| 27 | Lorca | 97 k | 204 | n/d | ad-hoc | 23,3 | 24,2 | **47** | inferido |
+| 1 | **Madrid** | 3.506.730 | 672 | 262,4 | CKAN+DCAT | 48,5 | 49,7 | **98** | medido |
+| 2 | **Barcelona** | 1.731.649 | 555 | 61,7 | CKAN+DCAT | 43,9 | 46,5 | **90** | medido |
+| 3 | Málaga | 599.063 | 1.369 | ~10 | CKAN+DCAT | 39,5 | 38,9 | **78** | medido |
+| 4 | Reus | 111.601 | 119 | 0,6 | CKAN+DCAT | 23,9 | 54,4 | **78** | medido |
+| 5 | Alcobendas | 123.342 | 177 | 0,5 | CKAN+DCAT | 25,6 | 51,1 | **77** | medido |
+| 6 | Terrassa | 233.270 | 125 | 0,1 | CKAN+DCAT | 24,9 | 48,7 | **74** | medido |
+| 7 | Avilés | 75.517 | 107 | 0,1 | CKAN+DCAT | 21,0 | 51,4 | **72** | medido |
+| 8 | Pamplona | 209.094 | 35 | n/d | CKAN+DCAT | 24,4 | 46,2 | **71** | medido |
+| 9 | Sta. Cruz Tenerife | 211.957 | 86 | 0,7 | CKAN+DCAT | 26,4 | 42,1 | **69** | medido |
+| 10 | Arganda del Rey | 60.419 | 968 | 1,0 | CKAN+DCAT | 28,2 | 40,5 | **69** | medido |
+| 11 | Alcoy | 61.468 | 32 | 5,1 | CKAN+DCAT | 20,4 | 49,0 | **69** | medido |
+| 12 | S. Lorenzo Escorial | 18.872 | 49 | 0,01 | CKAN+DCAT | 12,5 | 55,7 | **68** | medido |
+| 13 | Torrent | 90.928 | 342 | 0,2 | CKAN+DCAT | 24,5 | 39,5 | **64** | medido |
+| 14 | Córdoba | 323.262 | 145 | 0,7 | CKAN+DCAT | 29,8 | 31,0 | **61** | medido |
+| 15 | Zaragoza | 693.091 | 228 | n/d | REST propio | 30,8 | 26,2 | **57** | inferido |
+| 16 | Valencia | 840.792 | 296 | n/d | ArcGIS | 32,1 | 24,2 | **56** | inferido |
+| 17 | Gijón | 269.894 | 783 | n/d | REST propio | 29,9 | 26,2 | **56** | inferido |
+| 18 | Ponferrada | 63.186 | 29 | 0,01 | CKAN+DCAT | 15,1 | 40,2 | **55** | medido |
+| 19 | Vitoria-Gasteiz | 260.699 | 197 | n/d | ficheros | 26,9 | 26,2 | **53** | inferido |
+| 20 | Donostia | 189.866 | 108 | n/d | ArcGIS | 24,4 | 28,2 | **53** | inferido |
+| 21 | Las Palmas GC | 381.868 | 24 | n/d | ArcGIS | 23,9 | 28,2 | **52** | inferido |
+| 22 | Cáceres | 96.651 | 116 | n/d | SPARQL propio | 22,1 | 30,2 | **52** | inferido |
+| 23 | Bilbao | 351.124 | 341 | n/d | web | 29,1 | 22,2 | **51** | inferido |
+| 24 | Vigo | 294.489 | 148 | n/d | web | 26,7 | 22,2 | **49** | inferido |
+| 25 | Santander | 175.425 | 58 | n/d | REST propio | 22,9 | 26,2 | **49** | inferido |
+| 26 | Sant Boi | 85.610 | 45 | n/d | ArcGIS Hub | 19,7 | 29,2 | **49** | inferido |
+| 27 | Lorca | 98.969 | 204 | n/d | ad-hoc | 23,3 | 24,2 | **48** | inferido |
 
 ### Por qué esas notas
 
 **Madrid, 98.** Único portal que puntúa alto en las dos mitades. Impacto máximo por población
-(3,4 M) y por volumen (262 GB, 11.010 recursos, el catálogo más profundo de España en
+(3.506.730 hab.) y por volumen (262 GB, 11.010 recursos, el catálogo más profundo de España en
 recursos por dataset: 16,4). Calidad casi máxima porque es el único con **100 % de datasets
 actualizados en los últimos 12 meses** (antigüedad mediana de metadatos: **4 días**), 100 %
 con descripción larga, 96 % con tamaño declarado, licencia CC-BY homogénea y DCAT completo
@@ -249,7 +257,7 @@ Un TFM que solo mire las capitales se los pierde, y son los mejores casos de pru
 limpio, pequeño, y sin ruido para depurar herramientas.
 
 **Arganda del Rey, 69.** Anomalía que merece un párrafo en la memoria: **968 datasets para
-60.000 habitantes**, más que Madrid. La razón es que publica series desagregadas como datasets
+60.419 habitantes**, más que Madrid. La razón es que publica series desagregadas como datasets
 independientes. Frescura: **16 % en 12 meses, antigüedad mediana 5,4 años**. Es el ejemplo
 canónico de "inflación de catálogo": el recuento de datasets como métrica de éxito de un portal
 está roto, y este dato lo demuestra. Úsalo en el cap. 3.
@@ -260,7 +268,7 @@ declara licencia**: 83 dicen `notspecified` y 62 no traen el campo, y el **83 % 
 de portal de datos abiertos. Es el peor caso medido, y por eso es útil: si el agente MCP no
 sirve aquí, sabemos por qué.
 
-**Sta. Cruz de Tenerife, 68 y Torrent, 64.** Ambos con **0 % de datasets actualizados en 24
+**Sta. Cruz de Tenerife, 69 y Torrent, 64.** Ambos con **0 % de datasets actualizados en 24
 meses** (antigüedad mediana 7,2 años). Calidad estructural buena, catálogos congelados.
 Son la prueba de que "formato correcto" ≠ "dato útil", una distinción que el banco de
 evaluación debería capturar explícitamente.
@@ -272,18 +280,22 @@ API de catálogo utilizable: hay que scrapear HTML. Aquí la penalización es de
 para agentes*, que es precisamente el objeto del TFM. La brecha entre "ciudad grande" y "ciudad
 consultable por un LLM" es el hallazgo central del capítulo 3.
 
-**Las Palmas GC, 52.** Con 381.000 habitantes debería estar arriba; tiene 24 datasets federados
+**Las Palmas GC, 52.** Con 381.868 habitantes debería estar arriba; tiene 24 datasets federados
 y sirve por ArcGIS/WFS, no por un catálogo DCAT. Si el TFM la incluye por proximidad
 personal, hay que asumir que es un **caso de estudio de carencia**, no un catálogo de referencia.
 
 ### Limitaciones de la puntuación
 
-- La población es padrón INE aproximado (~2024) tomado de memoria, no verificado contra fuente.
-  Corregir antes de publicar.
+- La población son las **cifras oficiales del INE a 1 de enero de 2025** (tabla 29005 de la
+  revisión del padrón municipal), las 27 de la misma tabla y del mismo año, con código INE y
+  serie por municipio en `research/data/poblacion_ine.json`. La cifra es oficial, pero está
+  **desfasada ~19 meses** respecto a la medición de los catálogos (25/07/2026): la revisión a
+  1 de enero de 2026 aún no estaba publicada. El desfase es homogéneo para todos y no altera
+  el orden relativo.
 - Las 13 filas "inferido" no tienen medición de frescura, formatos ni enlaces vivos: se les
   asignó un valor neutro. Su nota real puede moverse ±10.
-- La rúbrica pondera 50/50 impacto y calidad porque así se pidió; eso hace que Reus (108 k hab.)
-  empate con Málaga (596 k hab.). Si el objetivo es elegir ciudades para el TFM, mira las dos
+- La rúbrica pondera 50/50 impacto y calidad porque así se pidió; eso hace que Reus (111.601 hab.)
+  empate con Málaga (599.063 hab.). Si el objetivo es elegir ciudades para el TFM, mira las dos
   columnas por separado, no el total.
 
 ## 6. Licencias: ¿duplicar va contra la filosofía o la licencia?
