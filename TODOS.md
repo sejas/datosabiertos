@@ -206,6 +206,51 @@ limpio) · Gijón o Zaragoza (sin API estándar).
 
 ---
 
+## Fase 3bis — Etapa 2: explorar el contenido de los datasets · NUEVA, 25/07/2026
+
+> Óscar plantea dos etapas: explorar catálogos (hecho) y **explorar el contenido de uno o más
+> datasets**. Análisis completo en [docs/04-etapa-2-exploracion-datos.md](docs/04-etapa-2-exploracion-datos.md).
+> El alcance de esta fase se decide con él: las preguntas tabulares son asumibles, el cruce
+> geoespacial es otro TFM.
+
+- [ ] **3b.1 — Medir la cobertura real del datastore CKAN**
+  Comprobado ya: Madrid, Barcelona y Córdoba lo tienen; Málaga y Reus no. Falta saber qué
+  proporción de recursos está realmente cargada, que es distinto de que la API responda.
+  **DONE IS:**
+  - Por portal: % de recursos tabulares consultables por `datastore_search`, medido, no supuesto.
+  - Documentado qué formatos quedan fuera (el GeoJSON de BiciMad no está en el datastore).
+  - Cifras en el cap. 3 y en `research/`.
+
+- [ ] **3b.2 — `describir_distribucion`**
+  El `get_resource_info` de data.gouv.fr: dice si un recurso es consultable y con qué columnas,
+  **antes** de intentar consultarlo.
+  **DONE IS:** devuelve vía de acceso (datastore / descarga / ninguna), columnas con tipo, nº de
+  filas si se sabe, y tamaño; y un test que comprueba que no miente cuando no hay datastore.
+
+- [ ] **3b.3 — `consultar_datos` y `agregar_datos`**
+  Filas con filtros, y COUNT / COUNT DISTINCT / SUM / MAX agrupables. La agregación va en el
+  servidor a propósito: si el modelo tiene que contar filas, alucina.
+  **DONE IS:**
+  - Responden los dos primeros ejemplos de Óscar ("cuántos distritos tiene Madrid", "cuántos
+    municipios tiene España según este dataset").
+  - Caché con `fecha_sincronizacion`: consultar en vivo rompe la reproducibilidad de la fase 5.
+  - Límites de filas y de tamaño explícitos, como los de data.gouv.fr.
+
+- [ ] **3b.4 — Decidir si el cruce geoespacial entra en el TFM**
+  `research/etapa2_bicimad_distritos.py` ya responde la pregunta de BiciMad, pero a mano.
+  Convertirlo en herramienta es caro y se aleja de la pregunta de investigación.
+  **DONE IS:** decisión escrita y acordada con Óscar; si entra, `cruzar_geografico` con tests;
+  si no, queda en el cap. 7 como trabajo futuro con el script como prueba de viabilidad.
+
+- [ ] **3b.5 — Extender el banco a la etapa 2**
+  **DONE IS:**
+  - Campo `etapa` (1|2) en `bench/esquema.json` y en el validador.
+  - ≥15 preguntas de etapa 2 con **respuesta numérica verificable** y anclada a una fecha de
+    corte, de modo que se corrijan sin LLM-juez.
+  - Al menos una que exija darse cuenta de que el dato NO se puede calcular con lo publicado.
+
+---
+
 ## Fase 4 — Banco de evaluación · 4 semanas · ene–feb 2027
 
 > Con el prior art encontrado, **esta es la contribución principal del TFM**, no la secundaria.
