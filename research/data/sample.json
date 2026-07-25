@@ -1,0 +1,191 @@
+[
+ {
+  "portal": "Alcobendas",
+  "n": 30,
+  "vivos_pct": 100,
+  "media_MB": 0.3,
+  "mediana_KB": 26.4,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "206": 30
+  }
+ },
+ {
+  "portal": "Alcoi",
+  "n": 30,
+  "vivos_pct": 100,
+  "media_MB": 67.07,
+  "mediana_KB": 17.9,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "200": 30
+  }
+ },
+ {
+  "portal": "Arganda",
+  "n": 30,
+  "vivos_pct": 100,
+  "media_MB": 0.41,
+  "mediana_KB": 29.2,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "200": 30
+  }
+ },
+ {
+  "portal": "Aviles",
+  "n": 30,
+  "vivos_pct": 20,
+  "media_MB": 1.63,
+  "mediana_KB": 458.1,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "200": 6,
+   "TimeoutError": 24
+  }
+ },
+ {
+  "portal": "Barcelona",
+  "n": 30,
+  "vivos_pct": 7,
+  "media_MB": 5.73,
+  "mediana_KB": 5726.0,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "503": 28,
+   "206": 2
+  }
+ },
+ {
+  "portal": "Cordoba",
+  "n": 30,
+  "vivos_pct": 100,
+  "media_MB": 0.35,
+  "mediana_KB": 183.7,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "206": 30
+  }
+ },
+ {
+  "portal": "Madrid",
+  "n": 30,
+  "vivos_pct": 47,
+  "media_MB": 7.82,
+  "mediana_KB": 317.4,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "403": 16,
+   "206": 13,
+   "200": 1
+  }
+ },
+ {
+  "portal": "Malaga",
+  "n": 30,
+  "vivos_pct": 100,
+  "media_MB": 3.13,
+  "mediana_KB": 53.6,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "206": 23,
+   "200": 7
+  }
+ },
+ {
+  "portal": "Pamplona",
+  "n": 30,
+  "vivos_pct": 70,
+  "media_MB": null,
+  "mediana_KB": null,
+  "err_mediano_tam_%": null,
+  "codigos": {
+   "TimeoutError": 8,
+   "200": 21,
+   "500": 1
+  }
+ },
+ {
+  "portal": "Ponferrada",
+  "n": 30,
+  "vivos_pct": 100,
+  "media_MB": 0.14,
+  "mediana_KB": 52.7,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "206": 30
+  }
+ },
+ {
+  "portal": "Reus",
+  "n": 30,
+  "vivos_pct": 100,
+  "media_MB": 5.68,
+  "mediana_KB": 6.6,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "200": 30
+  }
+ },
+ {
+  "portal": "SCTenerife",
+  "n": 30,
+  "vivos_pct": 100,
+  "media_MB": 0.28,
+  "mediana_KB": 28.1,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "200": 30
+  }
+ },
+ {
+  "portal": "SanLorenzo",
+  "n": 30,
+  "vivos_pct": 100,
+  "media_MB": 0.16,
+  "mediana_KB": 6.2,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "206": 29,
+   "200": 1
+  }
+ },
+ {
+  "portal": "Tenerife_Cab",
+  "n": 30,
+  "vivos_pct": 97,
+  "media_MB": 6.07,
+  "mediana_KB": 417.4,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "206": 28,
+   "301": 1,
+   "200": 1
+  }
+ },
+ {
+  "portal": "Terrassa",
+  "n": 30,
+  "vivos_pct": 63,
+  "media_MB": 1.51,
+  "mediana_KB": 493.3,
+  "err_mediano_tam_%": 0.0,
+  "codigos": {
+   "206": 19,
+   "403": 8,
+   "500": 3
+  }
+ },
+ {
+  "portal": "Torrent",
+  "n": 30,
+  "vivos_pct": 90,
+  "media_MB": 0.39,
+  "mediana_KB": 16.2,
+  "err_mediano_tam_%": null,
+  "codigos": {
+   "200": 27,
+   "URLError": 3
+  }
+ }
+]

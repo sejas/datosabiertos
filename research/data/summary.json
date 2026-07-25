@@ -1,0 +1,534 @@
+[
+ {
+  "portal": "Malaga",
+  "error": null,
+  "n_datasets": 1371,
+  "total_reported": 1371,
+  "n_resources": 3261,
+  "meta_MB": 6.27,
+  "res_con_size": 1014,
+  "pct_size": 31.1,
+  "declared_GB": 2.477,
+  "top_formats": [
+   [
+    "PDF",
+    932
+   ],
+   [
+    "CSV",
+    823
+   ],
+   [
+    "SHP",
+    338
+   ],
+   [
+    "KML",
+    264
+   ],
+   [
+    "GEOJSON",
+    262
+   ],
+   [
+    "GML",
+    258
+   ]
+  ]
+ },
+ {
+  "portal": "Madrid",
+  "error": null,
+  "n_datasets": 672,
+  "total_reported": 672,
+  "n_resources": 11010,
+  "meta_MB": 19.73,
+  "res_con_size": 10593,
+  "pct_size": 96.2,
+  "declared_GB": 262.403,
+  "top_formats": [
+   [
+    "CSV",
+    4166
+   ],
+   [
+    "XLSX",
+    2637
+   ],
+   [
+    "PDF",
+    720
+   ],
+   [
+    "XLS",
+    715
+   ],
+   [
+    "XML",
+    669
+   ],
+   [
+    "ZIP",
+    605
+   ]
+  ]
+ },
+ {
+  "portal": "Barcelona",
+  "error": null,
+  "n_datasets": 555,
+  "total_reported": 555,
+  "n_resources": 6753,
+  "meta_MB": 12.89,
+  "res_con_size": 6750,
+  "pct_size": 100.0,
+  "declared_GB": 61.716,
+  "top_formats": [
+   [
+    "CSV",
+    3391
+   ],
+   [
+    "JSON",
+    1396
+   ],
+   [
+    "ZIP",
+    918
+   ],
+   [
+    "XML",
+    432
+   ],
+   [
+    "APPLICATION/",
+    200
+   ],
+   [
+    "GPKG",
+    183
+   ]
+  ]
+ },
+ {
+  "portal": "Arganda",
+  "error": null,
+  "n_datasets": 1003,
+  "total_reported": 1003,
+  "n_resources": 3511,
+  "meta_MB": 4.9,
+  "res_con_size": 2343,
+  "pct_size": 66.7,
+  "declared_GB": 1.027,
+  "top_formats": [
+   [
+    "CSV",
+    1051
+   ],
+   [
+    "JSON",
+    1038
+   ],
+   [
+    "XLS",
+    883
+   ],
+   [
+    "PDF",
+    438
+   ],
+   [
+    "GEOJSON",
+    36
+   ],
+   [
+    "XLSX",
+    32
+   ]
+  ]
+ },
+ {
+  "portal": "Cordoba",
+  "error": null,
+  "n_datasets": 145,
+  "total_reported": 145,
+  "n_resources": 2013,
+  "meta_MB": 1.98,
+  "res_con_size": 1965,
+  "pct_size": 97.6,
+  "declared_GB": 0.712,
+  "top_formats": [
+   [
+    "PDF",
+    1674
+   ],
+   [
+    "XLS",
+    161
+   ],
+   [
+    "CSV",
+    55
+   ],
+   [
+    "GEOJSON",
+    40
+   ],
+   [
+    "XLSX",
+    22
+   ],
+   [
+    "HTML",
+    18
+   ]
+  ]
+ },
+ {
+  "portal": "Reus",
+  "error": null,
+  "n_datasets": 119,
+  "total_reported": 119,
+  "n_resources": 353,
+  "meta_MB": 0.79,
+  "res_con_size": 339,
+  "pct_size": 96.0,
+  "declared_GB": 0.56,
+  "top_formats": [
+   [
+    "CSV",
+    326
+   ],
+   [
+    "GEOJSON",
+    27
+   ]
+  ]
+ },
+ {
+  "portal": "Pamplona",
+  "error": null,
+  "n_datasets": 35,
+  "total_reported": 35,
+  "n_resources": 372,
+  "meta_MB": 0.41,
+  "res_con_size": 0,
+  "pct_size": 0.0,
+  "declared_GB": 0.0,
+  "top_formats": [
+   [
+    "CSV",
+    93
+   ],
+   [
+    "JSON",
+    93
+   ],
+   [
+    "HTML",
+    93
+   ],
+   [
+    "XML",
+    93
+   ]
+  ]
+ },
+ {
+  "portal": "Alcobendas",
+  "error": null,
+  "n_datasets": 153,
+  "total_reported": 153,
+  "n_resources": 820,
+  "meta_MB": 1.32,
+  "res_con_size": 493,
+  "pct_size": 60.1,
+  "declared_GB": 0.486,
+  "top_formats": [
+   [
+    "JSON",
+    205
+   ],
+   [
+    "CSV",
+    175
+   ],
+   [
+    "XLS",
+    97
+   ],
+   [
+    "XML",
+    90
+   ],
+   [
+    "ODS",
+    89
+   ],
+   [
+    "XLSX",
+    63
+   ]
+  ]
+ },
+ {
+  "portal": "Aviles",
+  "error": null,
+  "n_datasets": 107,
+  "total_reported": 107,
+  "n_resources": 308,
+  "meta_MB": 0.66,
+  "res_con_size": 146,
+  "pct_size": 47.4,
+  "declared_GB": 0.144,
+  "top_formats": [
+   [
+    "CSV",
+    265
+   ],
+   [
+    "XLSX",
+    42
+   ],
+   [
+    "XSLX",
+    1
+   ]
+  ]
+ },
+ {
+  "portal": "SCTenerife",
+  "error": null,
+  "n_datasets": 104,
+  "total_reported": 104,
+  "n_resources": 715,
+  "meta_MB": 0.96,
+  "res_con_size": 703,
+  "pct_size": 98.3,
+  "declared_GB": 0.718,
+  "top_formats": [
+   [
+    "JSON",
+    108
+   ],
+   [
+    "CSV",
+    102
+   ],
+   [
+    "XLS",
+    97
+   ],
+   [
+    "KML",
+    84
+   ],
+   [
+    "KMZ",
+    84
+   ],
+   [
+    "GEOJSON",
+    76
+   ]
+  ]
+ },
+ {
+  "portal": "Alcoi",
+  "error": null,
+  "n_datasets": 32,
+  "total_reported": 32,
+  "n_resources": 165,
+  "meta_MB": 0.22,
+  "res_con_size": 156,
+  "pct_size": 94.5,
+  "declared_GB": 5.128,
+  "top_formats": [
+   [
+    "CSV",
+    62
+   ],
+   [
+    "ZIP",
+    26
+   ],
+   [
+    "GEOJSON",
+    24
+   ],
+   [
+    "KML",
+    24
+   ],
+   [
+    "SHAPE",
+    24
+   ],
+   [
+    "JSON",
+    5
+   ]
+  ]
+ },
+ {
+  "portal": "Ponferrada",
+  "error": null,
+  "n_datasets": 29,
+  "total_reported": 29,
+  "n_resources": 41,
+  "meta_MB": 0.14,
+  "res_con_size": 41,
+  "pct_size": 100.0,
+  "declared_GB": 0.006,
+  "top_formats": [
+   [
+    "APPLICATION/",
+    35
+   ],
+   [
+    "TEXT/CSV",
+    6
+   ]
+  ]
+ },
+ {
+  "portal": "Torrent",
+  "error": null,
+  "n_datasets": 342,
+  "total_reported": 342,
+  "n_resources": 437,
+  "meta_MB": 1.17,
+  "res_con_size": 0,
+  "pct_size": 0.0,
+  "declared_GB": 0.0,
+  "top_formats": [
+   [
+    "CSV",
+    332
+   ],
+   [
+    "GEOJSON",
+    35
+   ],
+   [
+    "SHP",
+    29
+   ],
+   [
+    "KML",
+    24
+   ],
+   [
+    "JSON",
+    10
+   ],
+   [
+    "XLSX",
+    3
+   ]
+  ]
+ },
+ {
+  "portal": "Terrassa",
+  "error": null,
+  "n_datasets": 125,
+  "total_reported": 125,
+  "n_resources": 153,
+  "meta_MB": 0.6,
+  "res_con_size": 145,
+  "pct_size": 94.8,
+  "declared_GB": 0.122,
+  "top_formats": [
+   [
+    "CSV",
+    93
+   ],
+   [
+    "KMZ",
+    23
+   ],
+   [
+    "JPEG",
+    20
+   ],
+   [
+    "SHP",
+    5
+   ],
+   [
+    "GEOJSON",
+    5
+   ],
+   [
+    "GTFS",
+    2
+   ]
+  ]
+ },
+ {
+  "portal": "SanLorenzo",
+  "error": null,
+  "n_datasets": 49,
+  "total_reported": 49,
+  "n_resources": 122,
+  "meta_MB": 0.31,
+  "res_con_size": 120,
+  "pct_size": 98.4,
+  "declared_GB": 0.008,
+  "top_formats": [
+   [
+    "XLSX",
+    59
+   ],
+   [
+    "CSV",
+    59
+   ],
+   [
+    "GEOJSON",
+    3
+   ],
+   [
+    "SHP",
+    1
+   ]
+  ]
+ },
+ {
+  "portal": "Tenerife_Cab",
+  "error": null,
+  "n_datasets": 285,
+  "total_reported": 285,
+  "n_resources": 5437,
+  "meta_MB": 5.92,
+  "res_con_size": 5282,
+  "pct_size": 97.1,
+  "declared_GB": 56.191,
+  "top_formats": [
+   [
+    "JSON",
+    2484
+   ],
+   [
+    "CSV",
+    1247
+   ],
+   [
+    "TXT",
+    908
+   ],
+   [
+    "GEOJSON",
+    189
+   ],
+   [
+    "GEOPACKAGE",
+    160
+   ],
+   [
+    "API",
+    136
+   ]
+  ]
+ }
+]

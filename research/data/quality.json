@@ -1,0 +1,130 @@
+[
+ {
+  "portal": "Alcobendas",
+  "ds": 153,
+  "maq": 93,
+  "a12": 85,
+  "med_age": 185,
+  "desc": 66
+ },
+ {
+  "portal": "Alcoi",
+  "ds": 32,
+  "maq": 84,
+  "a12": 84,
+  "med_age": 10,
+  "desc": 0
+ },
+ {
+  "portal": "Arganda",
+  "ds": 1003,
+  "maq": 87,
+  "a12": 16,
+  "med_age": 1957,
+  "desc": 4
+ },
+ {
+  "portal": "Aviles",
+  "ds": 107,
+  "maq": 100,
+  "a12": 100,
+  "med_age": 52,
+  "desc": 0
+ },
+ {
+  "portal": "Barcelona",
+  "ds": 555,
+  "maq": 82,
+  "a12": 46,
+  "med_age": 472,
+  "desc": 70
+ },
+ {
+  "portal": "Cordoba",
+  "ds": 145,
+  "maq": 15,
+  "a12": 25,
+  "med_age": 800,
+  "desc": 25
+ },
+ {
+  "portal": "Madrid",
+  "ds": 672,
+  "maq": 86,
+  "a12": 100,
+  "med_age": 4,
+  "desc": 100
+ },
+ {
+  "portal": "Malaga",
+  "ds": 1371,
+  "maq": 68,
+  "a12": 16,
+  "med_age": 1541,
+  "desc": 64
+ },
+ {
+  "portal": "Pamplona",
+  "ds": 35,
+  "maq": 75,
+  "a12": 100,
+  "med_age": 155,
+  "desc": 34
+ },
+ {
+  "portal": "Ponferrada",
+  "ds": 29,
+  "maq": 15,
+  "a12": 72,
+  "med_age": 123,
+  "desc": 24
+ },
+ {
+  "portal": "Reus",
+  "ds": 119,
+  "maq": 100,
+  "a12": 97,
+  "med_age": 24,
+  "desc": 61
+ },
+ {
+  "portal": "SCTenerife",
+  "ds": 104,
+  "maq": 98,
+  "a12": 0,
+  "med_age": 2621,
+  "desc": 47
+ },
+ {
+  "portal": "SanLorenzo",
+  "ds": 49,
+  "maq": 100,
+  "a12": 100,
+  "med_age": 169,
+  "desc": 90
+ },
+ {
+  "portal": "Tenerife_Cab",
+  "ds": 285,
+  "maq": 97,
+  "a12": 84,
+  "med_age": 6,
+  "desc": 94
+ },
+ {
+  "portal": "Terrassa",
+  "ds": 125,
+  "maq": 86,
+  "a12": 84,
+  "med_age": 81,
+  "desc": 31
+ },
+ {
+  "portal": "Torrent",
+  "ds": 342,
+  "maq": 99,
+  "a12": 0,
+  "med_age": 2671,
+  "desc": 74
+ }
+]
