@@ -182,7 +182,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
   - Reintentos con *backoff* exponencial ante 429/503.
   - Ejecución programada semanal y registro de errores por portal.
 
-- [ ] **3.4 — Servidor MCP v1**
+- [~] **3.4 — Servidor MCP v1** — prototipo con las 4 herramientas; falta probarlo desde un 2º cliente real
   Herramientas del §4 del plan, sobre el índice local. Reutilizando lo decidido en 0.1.
   **DONE IS:**
   - `buscar_datasets`, `detalle_dataset`, `listar_distribuciones`, `comparar_ciudades`
@@ -192,7 +192,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
   - Se conecta y lista herramientas correctamente desde ≥2 clientes MCP distintos.
   - Ninguna herramienta tarda más de 2 s en el p95 contra el índice local.
 
-- [ ] **3.5 — Decisión sobre `consultar_sparql`**
+- [x] **3.5 — Decisión sobre `consultar_sparql`** ✅ no se implementa en la v1 (docs/03-prior-art.md §5.5)
   Exponer SPARQL libre a un LLM es potente y arriesgado (consultas que tumban el endpoint,
   inyección, resultados imposibles de verificar).
   **DONE IS:** decisión escrita y argumentada; si se implementa, con límite de tiempo, de
