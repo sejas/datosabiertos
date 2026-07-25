@@ -23,6 +23,9 @@ TITULO_NO_DECLARADA = "No declarada por el portal de origen"
 
 #: Valores que los portales usan para decir "no hay licencia". Córdoba usa `notspecified`
 #: en el 43 % de sus datasets. Comparados en minúsculas y sin acentos.
+#: Se comparan tras pasar por `clave_licencia()`, que unifica guiones y guiones bajos con
+#: espacios: así "notspecified", "not-specified", "not_specified" y "Not Specified" —las
+#: cuatro formas que aparecen en los portales del corpus— colapsan en la misma clave.
 VALORES_SIN_LICENCIA = frozenset(
     {
         "",
@@ -30,9 +33,8 @@ VALORES_SIN_LICENCIA = frozenset(
         "none",
         "null",
         "notspecified",
-        "not-specified",
-        "not_specified",
-        "no-especificada",
+        "not specified",
+        "license not specified",
         "no especificada",
         "no se especifico la licencia",
         "sin licencia",
@@ -72,6 +74,13 @@ def normalizar_texto(texto: str | None) -> str:
     return re.sub(r"\s+", " ", sin_acentos).strip().lower()
 
 
+def clave_licencia(texto: str | None) -> str:
+    """Clave comparable de una licencia: sin acentos, sin mayúsculas y con los separadores
+    unificados. `notspecified`, `not-specified`, `not_specified` y "Not Specified" —las
+    cuatro formas presentes en los portales del corpus— dan la misma clave."""
+    return re.sub(r"[\s_-]+", " ", normalizar_texto(texto)).strip()
+
+
 def normalizar_licencia(
     identificador: str | None, titulo: str | None = None, url: str | None = None
 ) -> Licencia:
@@ -82,15 +91,35 @@ def normalizar_licencia(
     """
     bruto = (identificador or "").strip()
     clave = normalizar_texto(bruto)
-    titulo_normalizado = normalizar_texto(titulo)
-    if clave in VALORES_SIN_LICENCIA or titulo_normalizado in VALORES_SIN_LICENCIA:
+    clave_comparable = clave_licencia(bruto)
+    titulo_normalizado = clave_licencia(titulo)
+
+    no_declarada = Licencia(
+        identificador=LICENCIA_NO_DECLARADA,
+        titulo=TITULO_NO_DECLARADA,
+        url="",
+        declarada=False,
+        identificador_origen=bruto,
+    )
+
+    # El identificador manda: si el portal dice explícitamente `notspecified`, la licencia
+    # no está declarada por mucho que CKAN rellene un título genérico.
+    if clave_comparable and clave_comparable in VALORES_SIN_LICENCIA:
+        return no_declarada
+
+    # Sin identificador, decide el título. Ojo: un `license_title` vacío NO significa
+    # ausencia de licencia si hay identificador — muchos portales solo mandan `license_id`.
+    if not clave_comparable:
+        if titulo_normalizado in VALORES_SIN_LICENCIA:
+            return no_declarada
         return Licencia(
-            identificador=LICENCIA_NO_DECLARADA,
-            titulo=TITULO_NO_DECLARADA,
-            url="",
-            declarada=False,
+            identificador=titulo_normalizado,
+            titulo=(titulo or "").strip(),
+            url=(url or "").strip(),
+            declarada=True,
             identificador_origen=bruto,
         )
+
     return Licencia(
         identificador=clave,
         titulo=(titulo or bruto).strip(),
