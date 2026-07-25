@@ -7,7 +7,8 @@ parece un estándar no lo es del todo, y las diferencias medidas están tratadas
   demás llaman `name`/`title` en `organization`, y su `organization` es el *departamento*
   (Habitatge, Territori…), no el ayuntamiento.
 - **Madrid** añade `modified` e `issued` (DCAT) además de `metadata_modified`.
-- **Córdoba** declara `notspecified` en el 43 % de sus datasets: acaba en
+- **Córdoba** declara `notspecified` en 83 de sus 145 datasets y omite el campo en los
+  otros 62 —el 100 % sin licencia declarada—: acaba en
   `licencia.declarada = False`, nunca en CC-BY.
 - **Málaga** declara `by-sa-40`, la licencia más restrictiva del corpus.
 

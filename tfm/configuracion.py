@@ -151,7 +151,7 @@ CORPUS: dict[str, Portal] = {
         url_api="https://datosabiertos.cordoba.es/api/3/action",
         url_base="https://datosabiertos.cordoba.es",
         notas=(
-            "61/100, peor caso del corpus: 43 % sin licencia declarada o `notspecified` "
+            "61/100, peor caso del corpus: 145 de 145 datasets sin licencia declarada "
             "y 83 % de recursos en PDF."
         ),
     ),

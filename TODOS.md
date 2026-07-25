@@ -155,7 +155,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
 > El índice local va **primero**. La fase 4 no puede medirse contra portales que devuelven 503
 > de forma aleatoria: sin índice, la evaluación no es reproducible y el TFM no se sostiene.
 
-- [ ] **3.1 — Índice local de metadatos**
+- [x] **3.1 — Índice local de metadatos** ✅ 25/07/2026
   Volcado periódico de los catálogos del corpus a un almacén propio (SQLite o DuckDB).
   ~100–150 MB para los 107 municipios, así que cabe entero.
   **DONE IS:**
@@ -165,7 +165,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
   - Búsqueda de texto completo en español funcionando (acentos y plurales incluidos).
   - Tamaño y tiempo de construcción registrados en el README.
 
-- [ ] **3.2 — Trazabilidad de procedencia extremo a extremo**
+- [~] **3.2 — Trazabilidad de procedencia extremo a extremo** — hecho en el índice; falta al exponerlo por MCP
   Exigencia legal (RD 1495/2011 art. 8) y de integridad, no un extra.
   **DONE IS:**
   - Toda respuesta de herramienta incluye `url_origen`, `licencia`,
@@ -174,7 +174,7 @@ limpio) · Gijón o Zaragoza (sin API estándar).
     nunca asumidos como CC-BY.
   - Test automático que falla si alguna herramienta devuelve un dataset sin procedencia.
 
-- [ ] **3.3 — Cosecha cortés y programada**
+- [~] **3.3 — Cosecha cortés y programada** — falta solo la programación semanal
   **DONE IS:**
   - Concurrencia máxima configurable, por defecto ≤2 por host; respeta `Crawl-Delay`
     (Málaga fija 10 s).

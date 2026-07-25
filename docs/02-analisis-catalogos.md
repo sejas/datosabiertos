@@ -254,8 +254,8 @@ independientes. Frescura: **16 % en 12 meses, antigüedad mediana 5,4 años**. E
 canónico de "inflación de catálogo": el recuento de datasets como métrica de éxito de un portal
 está roto, y este dato lo demuestra. Úsalo en el cap. 3.
 
-**Córdoba, 61.** Penalizada duramente en licencia (1,5/5): **43 % de sus datasets no declaran
-licencia o la declaran como `notspecified`**, y el **83 % de sus recursos son PDF** (1.674 de
+**Córdoba, 61.** Penalizada duramente en licencia (1,5/5): **ninguno de sus 145 datasets
+declara licencia**: 83 dicen `notspecified` y 62 no traen el campo, y el **83 % de sus recursos son PDF** (1.674 de
 2.013), con solo un 15 % de formatos máquina-legibles. Un portal de transparencia disfrazado
 de portal de datos abiertos. Es el peor caso medido, y por eso es útil: si el agente MCP no
 sirve aquí, sabemos por qué.

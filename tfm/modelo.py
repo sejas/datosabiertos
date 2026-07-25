@@ -22,7 +22,7 @@ LICENCIA_NO_DECLARADA = "no-declarada"
 TITULO_NO_DECLARADA = "No declarada por el portal de origen"
 
 #: Valores que los portales usan para decir "no hay licencia". Córdoba usa `notspecified`
-#: en el 43 % de sus datasets. Comparados en minúsculas y sin acentos.
+#: en 83 de sus 145 datasets, y omite el campo en los otros 62.
 #: Se comparan tras pasar por `clave_licencia()`, que unifica guiones y guiones bajos con
 #: espacios: así "notspecified", "not-specified", "not_specified" y "Not Specified" —las
 #: cuatro formas que aparecen en los portales del corpus— colapsan en la misma clave.
