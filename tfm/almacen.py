@@ -24,8 +24,22 @@ from .registro import ErrorPortal, ResumenPortal, ahora_utc
 class Almacen:
     """Índice local de metadatos. Usar como gestor de contexto."""
 
-    def __init__(self, ruta: Path) -> None:
+    def __init__(self, ruta: Path, solo_lectura: bool = False) -> None:
+        """Abre el índice. Con `solo_lectura`, ni crea el esquema ni escribe nada.
+
+        El modo de solo lectura no es un lujo: `__init__` ejecuta el DDL y anota la versión
+        del esquema, o sea que **escribe**. Un servidor HTTP con varios hilos abriendo el
+        mismo fichero se bloquea entre sí (`database is locked`), y además un endpoint
+        público no debe poder tocar el índice ni por accidente.
+        """
         self.ruta = Path(ruta)
+        self.solo_lectura = solo_lectura
+        if solo_lectura:
+            if not self.ruta.exists():
+                raise FileNotFoundError(f"no existe el índice: {self.ruta}")
+            self.conexion = sqlite3.connect(f"file:{self.ruta}?mode=ro", uri=True)
+            self.conexion.row_factory = sqlite3.Row
+            return
         self.ruta.parent.mkdir(parents=True, exist_ok=True)
         self.conexion = sqlite3.connect(self.ruta)
         self.conexion.row_factory = sqlite3.Row
@@ -40,7 +54,8 @@ class Almacen:
         self.cerrar()
 
     def cerrar(self) -> None:
-        self.conexion.commit()
+        if not self.solo_lectura:
+            self.conexion.commit()
         self.conexion.close()
 
     def _anotar(self, clave: str, valor: str) -> None:

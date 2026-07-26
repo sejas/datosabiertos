@@ -23,6 +23,18 @@ los tres proyectos del prior art que la exponen uno la desactivó por diseño y 
 restringe con cuatro salvaguardas. El argumento completo está en
 [docs/03-prior-art.md](../../docs/03-prior-art.md) §5.5, y cierra el TODO 3.5 para la v1.
 
+## Dos transportes
+
+```bash
+python -m tfm.mcp                      # stdio: para un cliente local
+python -m tfm.mcp.http --puerto 8080   # HTTP: para que lo use otra gente
+```
+
+El HTTP expone `POST /mcp` (JSON-RPC), `GET /salud` y `GET /` con el catálogo, con CORS
+abierto para que una página web pueda llamarlo sin pasarela. Abre el índice en **solo
+lectura**: un endpoint público no debe poder escribir, y además sin eso los hilos se
+bloquean entre sí (`database is locked`).
+
 ## Configuración en un cliente
 
 ```json

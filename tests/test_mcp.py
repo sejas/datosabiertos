@@ -230,3 +230,42 @@ class TestProtocoloMCP(BaseIndice):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSoloLectura(BaseIndice):
+    """El endpoint HTTP abre el índice en solo lectura: no debe poder escribir."""
+
+    def test_no_escribe_y_sigue_consultando(self):
+        import sqlite3
+        ruta = self.almacen.ruta
+        self.almacen.cerrar()
+        lector = Almacen(ruta, solo_lectura=True)
+        try:
+            self.assertTrue(lector.solo_lectura)
+            self.assertEqual(lector.estadisticas()["datasets"], 2)
+            self.assertTrue(lector.buscar("calidad del aire"))
+            with self.assertRaises(sqlite3.OperationalError):
+                lector.conexion.execute("DELETE FROM dataset")
+        finally:
+            lector.cerrar()
+            self.almacen = Almacen(ruta)  # para que tearDown no falle
+
+    def test_indice_inexistente_falla_pronto(self):
+        with self.assertRaises(FileNotFoundError):
+            Almacen(Path(self.directorio.name) / "no-existe.sqlite", solo_lectura=True)
+
+
+class TestTransporteHTTP(BaseIndice):
+    """El manejador HTTP encamina al mismo ServidorMCP que stdio."""
+
+    def test_las_rutas_declaradas_existen(self):
+        from tfm.mcp import http as modulo
+        for metodo in ("do_GET", "do_POST", "do_OPTIONS"):
+            self.assertTrue(hasattr(modulo.Manejador, metodo))
+        self.assertLessEqual(modulo.TAMANO_MAXIMO, 10_000_000)
+
+    def test_una_notificacion_no_produce_respuesta(self):
+        """Si atender() devuelve None, el HTTP responde 202 sin cuerpo."""
+        servidor = ServidorMCP(self.almacen)
+        self.assertIsNone(servidor.atender({"jsonrpc": "2.0",
+                                            "method": "notifications/initialized"}))
