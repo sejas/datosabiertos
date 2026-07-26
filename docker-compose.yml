@@ -1,0 +1,25 @@
+# Un único servicio sirve las dos cosas:
+#   - A: el servidor MCP por HTTP en POST /mcp, para que otra gente lo use con su cliente
+#        y su propio modelo (el modelo de mcp.data.gouv.fr).
+#   - B: el cliente del navegador en /, con el índice y un modelo pequeño por WebGPU.
+# Mismo origen para ambos, así que no hace falta CORS entre la página y su API.
+services:
+  app:
+    build: .
+    container_name: ${SITE}_app
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - traefik_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${SITE}.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.${SITE}.entrypoints=websecure"
+      - "traefik.http.routers.${SITE}.tls=true"
+      - "traefik.http.routers.${SITE}.tls.certresolver=cloudflare"
+      - "traefik.http.services.${SITE}.loadbalancer.server.port=8080"
+      - "traefik.docker.network=traefik_proxy"
+
+networks:
+  traefik_proxy:
+    external: true

@@ -1,0 +1,8 @@
+.git
+__pycache__
+*.pyc
+tests
+research
+docs
+bench
+datos/cosecha.log

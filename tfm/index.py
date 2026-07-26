@@ -16,6 +16,7 @@ import argparse
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 from . import configuracion as cfg
 from .almacen import Almacen
@@ -104,6 +105,37 @@ def buscar(args: argparse.Namespace) -> int:
     return 0
 
 
+def exportar_web(args: argparse.Namespace) -> int:
+    """Genera el índice ligero que consume el cliente del navegador.
+
+    Quita el JSON crudo y la bitácora de errores, compacta con VACUUM y deja al lado una
+    copia comprimida. 65 MB -> 21 MB -> 3,4 MB en gzip. Sin este comando el despliegue no
+    sería reproducible desde el repositorio, porque `datos/` no se versiona.
+    """
+    import gzip
+    import shutil
+    import sqlite3
+
+    destino = Path(args.destino)
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(cfg.RUTA_INDICE, destino)
+    conexion = sqlite3.connect(destino)
+    for tabla in ("dataset_crudo", "error_cosecha"):
+        conexion.execute(f"DROP TABLE IF EXISTS {tabla}")
+    conexion.commit()
+    conexion.execute("VACUUM")
+    conexion.close()
+
+    comprimido = destino.with_suffix(destino.suffix + ".gz")
+    with open(destino, "rb") as origen, gzip.open(comprimido, "wb", compresslevel=9) as salida:
+        shutil.copyfileobj(origen, salida)
+
+    print(f"{cfg.RUTA_INDICE} ({_mb(cfg.RUTA_INDICE.stat().st_size)})")
+    print(f"  -> {destino} ({_mb(destino.stat().st_size)})")
+    print(f"  -> {comprimido} ({_mb(comprimido.stat().st_size)})  <- lo que viaja al navegador")
+    return 0
+
+
 def estado(_args: argparse.Namespace) -> int:
     with Almacen(cfg.RUTA_INDICE) as almacen:
         estadisticas = almacen.estadisticas()
@@ -169,6 +201,11 @@ def principal(argv: list[str] | None = None) -> int:
     orden_buscar.set_defaults(funcion=buscar)
 
     subordenes.add_parser("estado", help="resumen del índice").set_defaults(funcion=estado)
+
+    orden_web = subordenes.add_parser(
+        "exportar-web", help="índice ligero + gzip para el cliente del navegador")
+    orden_web.add_argument("--destino", default="web/datos/indice.sqlite")
+    orden_web.set_defaults(funcion=exportar_web)
 
     orden_errores = subordenes.add_parser("errores", help="errores de cosecha registrados")
     orden_errores.add_argument("--portal", action="append")

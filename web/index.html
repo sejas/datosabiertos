@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datos abiertos municipales · agente en el navegador (TFM)</title>
+<meta name="description" content="Pregunta en lenguaje natural sobre catálogos municipales españoles de datos abiertos. El índice y el modelo corren en tu navegador.">
+<style>
+  :root {
+    --tinta: #16202a; --tenue: #5d6b7a; --linea: #dfe5ea; --fondo: #fbfcfd;
+    --panel: #fff; --acento: #1d5c8f; --alerta: #9a3d12; --ok: #17614a;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --tinta: #e6edf3; --tenue: #9aa8b6; --linea: #2a3541; --fondo: #11161c;
+      --panel: #171e26; --acento: #6fb2e8; --alerta: #e8a37a; --ok: #6cc7a6;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--tinta); background: var(--fondo);
+  }
+  header { border-bottom: 1px solid var(--linea); padding: 1.1rem 1rem; background: var(--panel); }
+  .contenedor { max-width: 62rem; margin: 0 auto; padding: 0 1rem; }
+  h1 { margin: 0 0 .2rem; font-size: 1.15rem; letter-spacing: -.01em; }
+  header p { margin: 0; color: var(--tenue); font-size: .87rem; }
+  main { padding: 1.4rem 0 4rem; }
+  fieldset { border: 1px solid var(--linea); border-radius: 10px; padding: 1rem; margin: 0 0 1.2rem; background: var(--panel); }
+  legend { padding: 0 .4rem; font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--tenue); }
+  label { display: block; font-size: .82rem; color: var(--tenue); margin-bottom: .25rem; }
+  input[type=text], select {
+    width: 100%; padding: .6rem .7rem; font: inherit; color: var(--tinta);
+    background: var(--fondo); border: 1px solid var(--linea); border-radius: 7px;
+  }
+  button {
+    font: inherit; font-weight: 600; padding: .6rem 1.1rem; border-radius: 7px; cursor: pointer;
+    background: var(--acento); color: #fff; border: 1px solid transparent;
+  }
+  button.secundario { background: transparent; color: var(--acento); border-color: var(--linea); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .fila { display: flex; gap: .6rem; align-items: flex-end; flex-wrap: wrap; }
+  .fila > :first-child { flex: 1 1 18rem; }
+  .ejemplos { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .7rem; }
+  .ejemplos button { background: transparent; color: var(--tenue); border: 1px dashed var(--linea); font-weight: 400; font-size: .82rem; padding: .3rem .6rem; }
+  #estado { font-size: .85rem; color: var(--tenue); margin: .6rem 0 0; }
+  progress { width: 100%; height: 5px; }
+  .tarjeta { border: 1px solid var(--linea); border-left: 3px solid var(--acento); border-radius: 7px; padding: .75rem .9rem; margin-bottom: .7rem; background: var(--panel); }
+  .tarjeta h3 { margin: 0 0 .25rem; font-size: .97rem; }
+  .tarjeta p { margin: 0 0 .4rem; font-size: .87rem; color: var(--tenue); }
+  .meta { font-size: .76rem; color: var(--tenue); display: flex; gap: .8rem; flex-wrap: wrap; font-family: var(--mono); }
+  .sin-licencia { border-left-color: var(--alerta); }
+  .insignia { color: var(--alerta); font-weight: 700; }
+  a { color: var(--acento); }
+  .traza { font-family: var(--mono); font-size: .78rem; background: var(--fondo); border: 1px solid var(--linea); border-radius: 7px; padding: .6rem .7rem; margin-bottom: .7rem; white-space: pre-wrap; overflow-x: auto; }
+  .respuesta { border: 1px solid var(--linea); border-radius: 7px; padding: .9rem; background: var(--panel); white-space: pre-wrap; }
+  details { margin-top: .5rem; font-size: .84rem; }
+  .aviso { font-size: .82rem; color: var(--tenue); border-left: 3px solid var(--linea); padding-left: .7rem; margin: .8rem 0 0; }
+  .oculto { display: none; }
+</style>
+</head>
+<body>
+<header><div class="contenedor">
+  <h1>Datos abiertos municipales · agente en el navegador</h1>
+  <p>Índice local de catálogos DCAT de ayuntamientos españoles. Prototipo del TFM
+     (MUIA-UPM, dir. Óscar Corcho). <span id="resumen-indice">cargando el índice…</span></p>
+</div></header>
+
+<main class="contenedor">
+
+  <fieldset>
+    <legend>Modo directo · funciona siempre, sin modelo</legend>
+    <div class="fila">
+      <div>
+        <label for="q">Qué buscas</label>
+        <input type="text" id="q" placeholder="calidad del aire" autocomplete="off">
+      </div>
+      <div style="flex:0 1 12rem">
+        <label for="ciudad">Ciudad</label>
+        <select id="ciudad"><option value="">todas</option></select>
+      </div>
+      <button id="btn-buscar">Buscar</button>
+    </div>
+    <div class="ejemplos" id="ejemplos-directo"></div>
+    <p id="estado">Descargando el índice (3,4 MB comprimidos)…</p>
+    <progress id="barra" max="100" value="0"></progress>
+    <div id="resultados"></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Modo agente · modelo pequeño en tu navegador (WebGPU)</legend>
+    <p class="aviso" id="aviso-webgpu">Comprobando si tu navegador tiene WebGPU…</p>
+    <div class="fila" id="controles-modelo">
+      <div>
+        <label for="modelo">Modelo (se descarga una vez y queda en caché del navegador)</label>
+        <select id="modelo"></select>
+      </div>
+      <button id="btn-cargar" class="secundario" disabled>Cargar modelo</button>
+    </div>
+    <progress id="barra-modelo" max="100" value="0" class="oculto"></progress>
+    <p id="estado-modelo"></p>
+    <div class="fila" style="margin-top:.9rem">
+      <div>
+        <label for="pregunta">Pregunta en lenguaje natural</label>
+        <input type="text" id="pregunta" placeholder="¿Qué datos hay sobre calidad del aire en Málaga?" disabled autocomplete="off">
+      </div>
+      <button id="btn-preguntar" disabled>Preguntar</button>
+    </div>
+    <div class="ejemplos" id="ejemplos-agente"></div>
+    <div id="traza"></div>
+    <div id="respuesta"></div>
+  </fieldset>
+
+  <p class="aviso">
+    Los metadatos son copias de los portales municipales, no la fuente viva: cada resultado
+    lleva su <code>url_origen</code> y su fecha de sincronización. Los datasets cuyo portal no
+    declara licencia salen marcados como <span class="insignia">licencia no declarada</span>;
+    no se asume que sean abiertos. Código y método:
+    <a href="https://github.com/asejas/tfm-mcp-datos-abiertos">repositorio del TFM</a>.
+  </p>
+</main>
+
+<script src="vendor/sql-wasm.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
