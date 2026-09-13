@@ -81,7 +81,7 @@
     },
 
     "herramienta": {
-      "description": "Herramientas MCP del §4 de PLAN.md. `consultar_sparql` queda fuera hasta que se resuelva el TODO 3.5.",
+      "description": "Herramientas MCP del catálogo (README §Herramientas MCP). `consultar_sparql` queda fuera hasta que se resuelva el TODO 3.5.",
       "type": "string",
       "enum": [
         "buscar_datasets",
@@ -230,7 +230,7 @@
           "items": { "$ref": "#/$defs/referencia_dataset" }
         },
         "traza_esperada": {
-          "description": "Secuencia mínima de llamadas. Es la referencia de la métrica de corrección de traza del §6 de PLAN.md.",
+          "description": "Secuencia mínima de llamadas. Es la referencia de la métrica de corrección de traza del §6 del plan de evaluación.",
           "type": "array",
           "minItems": 1,
           "items": { "$ref": "#/$defs/llamada_esperada" }

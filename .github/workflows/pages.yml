@@ -1,0 +1,45 @@
+# Publica el cliente del navegador (web/) en GitHub Pages.
+#
+# El sitio es estático de verdad: el índice viaja como SQLite comprimido dentro del propio
+# repositorio y se consulta con sql.js en el navegador. No hay servidor detrás, así que el
+# servidor MCP en Python (tfm/mcp) no interviene aquí; para eso está el Dockerfile.
+name: Publicar el cliente web en Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Comprobar que el índice comprimido viaja en el repositorio
+        run: |
+          test -f web/datos/indice.sqlite.gz || {
+            echo "Falta web/datos/indice.sqlite.gz: el cliente no tendría índice que abrir." >&2
+            exit 1
+          }
+          ls -lh web/datos/indice.sqlite.gz
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - id: despliegue
+        uses: actions/deploy-pages@v4

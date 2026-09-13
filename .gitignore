@@ -1,4 +1,22 @@
-datos/
+# Índice de trabajo completo (62 MB, incluye el JSON crudo de cada portal): se reconstruye
+# con `python -m tfm.index build`, no se versiona.
+/datos/
 cat/
+
+# Del índice del navegador solo se publica la copia comprimida (3,4 MB); la descomprimida
+# y los ficheros temporales de SQLite se generan en local.
+web/datos/*
+!web/datos/indice.sqlite.gz
+
+# Documentos internos de seguimiento del TFM (plan, TODOs y actas con el director).
+PLAN.md
+TODOS.md
+docs/00-actas/
+
+# Herramientas locales
+.claude/
 __pycache__/
 *.pyc
+
+# Variables del despliegue (SITE, DOMAIN), solo en el servidor
+.env

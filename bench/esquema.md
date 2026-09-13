@@ -51,7 +51,7 @@ Lo que **no** se copia de esos benchmarks, y por qué:
   igualdad de cadenas: se puntúa contra `criterios_respuesta`. Una respuesta correcta
   redactada de otra forma tiene que puntuar igual.
 - **Nada de puntuación agregada única.** No hay un campo «puntos». Las métricas del §6 de
-  [`../PLAN.md`](../PLAN.md) se calculan desde los campos, no se anotan a mano.
+  el plan del TFM se calculan desde los campos, no se anotan a mano.
 
 ---
 
@@ -228,7 +228,7 @@ la traza» del §6 del plan.
 }
 ```
 
-- **`herramienta`** — solo las cuatro del §4 de [`PLAN.md`](../PLAN.md):
+- **`herramienta`** — solo las cuatro del [catálogo MCP](../README.md#herramientas-mcp):
   `buscar_datasets`, `detalle_dataset`, `listar_distribuciones`, `comparar_ciudades`.
   `consultar_sparql` queda **fuera** mientras el TODO 3.5 no se resuelva: incluirla en el
   banco sería comprometerse con una decisión de diseño que todavía está abierta.

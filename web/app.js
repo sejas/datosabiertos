@@ -19,7 +19,7 @@
 import { CATALOGO, ciudades, invocar } from './herramientas.js';
 
 const $ = (id) => document.getElementById(id);
-const RUTA_INDICE = 'datos/indice.sqlite';
+const RUTA_INDICE = 'datos/indice.sqlite.gz';
 const MAX_PASOS = 4;
 
 let bd = null;
@@ -34,7 +34,7 @@ async function abrirIndice() {
   const respuesta = await fetch(RUTA_INDICE);
   if (!respuesta.ok) throw new Error(`no se pudo descargar el índice (HTTP ${respuesta.status})`);
 
-  // Progreso de descarga: el índice son 21 MB (3,4 comprimidos) y sin barra parece colgado.
+  // Progreso de descarga: son 3,4 MB comprimidos (21 al descomprimir) y sin barra parece colgado.
   const total = Number(respuesta.headers.get('Content-Length')) || 0;
   const trozos = [];
   let recibido = 0;
@@ -46,9 +46,18 @@ async function abrirIndice() {
     recibido += value.length;
     if (total) $('barra').value = Math.round((recibido / total) * 100);
   }
-  const bytes = new Uint8Array(recibido);
+  const comprimido = new Uint8Array(recibido);
   let posicion = 0;
-  for (const t of trozos) { bytes.set(t, posicion); posicion += t.length; }
+  for (const t of trozos) { comprimido.set(t, posicion); posicion += t.length; }
+
+  // El repositorio publica solo el índice comprimido (3,4 MB en vez de 21). Se descomprime
+  // aquí, en el cliente, con la API nativa del navegador: sin librería y sin servidor.
+  if (typeof DecompressionStream !== 'function') {
+    throw new Error('este navegador no soporta DecompressionStream; usa Chrome/Edge 80+, ' +
+                    'Firefox 113+ o Safari 16.4+');
+  }
+  const flujo = new Blob([comprimido]).stream().pipeThrough(new DecompressionStream('gzip'));
+  const bytes = new Uint8Array(await new Response(flujo).arrayBuffer());
 
   bd = new SQL.Database(bytes);
   $('barra').classList.add('oculto');

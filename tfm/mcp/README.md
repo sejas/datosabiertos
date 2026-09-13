@@ -1,6 +1,6 @@
 # Servidor MCP — prototipo v1 (TODO 3.4)
 
-Expone las cuatro herramientas del §4 de [PLAN.md](../../PLAN.md) sobre el índice local.
+Expone las cuatro herramientas del catálogo (véase el [README](../../README.md#herramientas-mcp)) sobre el índice local.
 **Cero dependencias**: JSON-RPC 2.0 sobre stdio con la biblioteca estándar.
 
 ```bash
@@ -43,7 +43,7 @@ bloquean entre sí (`database is locked`).
     "tfm-datos-abiertos": {
       "command": "python3",
       "args": ["-m", "tfm.mcp"],
-      "cwd": "/home/macbookpro/projects/tfm"
+      "cwd": "/ruta/a/datosabiertos"
     }
   }
 }

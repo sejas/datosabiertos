@@ -16,11 +16,11 @@ from pathlib import Path
 
 NOMBRE_PROYECTO = "TFM-MCP-datos-abiertos"
 VERSION = "0.1.0"
-URL_PROYECTO = "https://github.com/asejas/tfm-mcp-datos-abiertos"
+URL_PROYECTO = "https://github.com/sejas/datosabiertos"
 
 #: Correo de contacto que se anuncia en el `User-Agent`. Sustituible por entorno para que
 #: quien reejecute la cosecha ponga el suyo y no el del autor.
-CORREO_CONTACTO = os.environ.get("TFM_CORREO_CONTACTO", "antonio@sejas.es")
+CORREO_CONTACTO = os.environ.get("TFM_CORREO_CONTACTO", "datosabiertos@sejas.es")
 
 
 def user_agent() -> str:

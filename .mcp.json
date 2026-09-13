@@ -2,8 +2,7 @@
   "mcpServers": {
     "tfm-datos-abiertos": {
       "command": "python3",
-      "args": ["-m", "tfm.mcp"],
-      "cwd": "/home/macbookpro/projects/tfm"
+      "args": ["-m", "tfm.mcp"]
     }
   }
 }
