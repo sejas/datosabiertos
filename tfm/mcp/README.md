@@ -6,7 +6,7 @@ Expone las cuatro herramientas del catálogo (véase el [README](../../README.md
 ```bash
 python -m tfm.index build     # una vez: construye el índice
 python -m tfm.mcp             # arranca el servidor (habla por stdin/stdout)
-python -m unittest discover -s tests   # 37 tests, sin red
+python -m unittest discover -s tests   # 59 tests, sin red
 ```
 
 ## Herramientas
@@ -30,17 +30,56 @@ python -m tfm.mcp                      # stdio: para un cliente local
 python -m tfm.mcp.http --puerto 8080   # HTTP: para que lo use otra gente
 ```
 
-El HTTP expone `POST /mcp` (JSON-RPC), `GET /salud` y `GET /` con el catálogo, con CORS
-abierto para que una página web pueda llamarlo sin pasarela. Abre el índice en **solo
-lectura**: un endpoint público no debe poder escribir, y además sin eso los hilos se
-bloquean entre sí (`database is locked`).
+El HTTP expone `POST /mcp` (JSON-RPC), `GET /salud`, `GET /` con el catálogo y, si hay
+`OPENROUTER_API_KEY`, `POST /chat` (véase más abajo). CORS abierto para que una página web
+pueda llamarlo sin pasarela. Abre el índice en **solo lectura**: un endpoint público no debe
+poder escribir, y además sin eso los hilos se bloquean entre sí (`database is locked`).
 
-## Configuración en un cliente
+Hay una instancia pública: **`https://datosabiertos.sejas.es/mcp`**.
+
+## Conectarlo a un agente
+
+### Por HTTP, contra el servidor público (sin instalar nada)
+
+```bash
+# Claude Code (probado con 2.1: conecta, lista y llama las cuatro herramientas)
+claude mcp add --transport http --scope user datosabiertos https://datosabiertos.sejas.es/mcp
+claude mcp list                                   # ✔ Connected
+
+# Codex CLI (probado con 0.154; escribe [mcp_servers.datosabiertos] en ~/.codex/config.toml)
+codex mcp add datosabiertos --url https://datosabiertos.sejas.es/mcp
+
+# Gemini CLI
+gemini mcp add --transport http datosabiertos https://datosabiertos.sejas.es/mcp
+```
+
+Cursor (`.cursor/mcp.json`) y VS Code (`.vscode/mcp.json`) aceptan la URL directamente:
+
+```json
+{ "mcpServers": { "datosabiertos": { "url": "https://datosabiertos.sejas.es/mcp" } } }
+{ "servers":    { "datosabiertos": { "type": "http", "url": "https://datosabiertos.sejas.es/mcp" } } }
+```
+
+Claude Desktop solo habla *stdio*; el puente `mcp-remote` (Node ≥ 20) lo resuelve en
+`claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "tfm-datos-abiertos": {
+    "datosabiertos": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://datosabiertos.sejas.es/mcp", "--transport", "http-only"]
+    }
+  }
+}
+```
+
+### Por stdio, con el repositorio clonado
+
+```json
+{
+  "mcpServers": {
+    "datosabiertos": {
       "command": "python3",
       "args": ["-m", "tfm.mcp"],
       "cwd": "/ruta/a/datosabiertos"
@@ -52,6 +91,21 @@ bloquean entre sí (`database is locked`).
 Vale para Claude Desktop, Claude Code (`.mcp.json`) y cualquier cliente con transporte
 stdio. Probado con una sesión JSON-RPC completa por subproceso: `initialize` →
 `notifications/initialized` → `tools/list` → `tools/call`.
+
+Un primer prompt que obliga a citar: *«Usa las herramientas de datosabiertos: ¿qué datos
+abiertos publica Málaga sobre calidad del aire? Para cada dataset dame el título, la
+url_origen tal cual la devuelve la herramienta, la fecha de modificación y si el portal
+declara licencia. Si no hay resultados, dilo sin inventar nada.»*
+
+## El chat alojado (`POST /chat`)
+
+`chat.py` es el experimento A del plan: el bucle de agente corre en el servidor con un
+modelo de OpenRouter y *tool calling* nativo, usando **los mismos `inputSchema`** que ve un
+cliente MCP. Responde en SSE con un evento por paso (`paso`, `delta`, `fin`, `error`) para
+que la página pinte la traza. El cliente solo manda mensajes `user`/`assistant`; el prompt
+del sistema lo pone el servidor. Cuesta dinero, así que hay tope por IP y tope diario
+(`TFM_CHAT_LIMITE_IP`, `TFM_CHAT_VENTANA`, `TFM_CHAT_LIMITE_DIA`); superado, responde 429 e
+invita a conectar el MCP al propio agente del visitante.
 
 ## Las tres decisiones que importan
 

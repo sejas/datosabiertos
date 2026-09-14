@@ -12,7 +12,9 @@ Rutas:
 - `POST /mcp` — JSON-RPC 2.0. Es el transporte *Streamable HTTP* en su forma mínima: se
   responde `application/json`, sin SSE ni sesiones. Suficiente para `initialize`,
   `tools/list` y `tools/call`, que es todo lo que este servidor implementa.
-- `GET /salud` — estado, nº de datasets y fecha de la última sincronización.
+- `POST /chat` — chat con un modelo alojado (OpenRouter) que usa las herramientas; responde
+  en SSE con un evento por paso. Solo existe si hay `OPENROUTER_API_KEY`; véase `chat.py`.
+- `GET /salud` — estado, nº de datasets, fecha de la última sincronización y si hay chat.
 - `GET /` — descripción legible con el catálogo de herramientas.
 
 CORS abierto a propósito: los metadatos son públicos y reutilizables, y así una página web
@@ -39,6 +41,7 @@ from pathlib import Path
 
 from .. import configuracion as cfg
 from ..almacen import Almacen
+from . import chat
 from .herramientas import CATALOGO
 from .servidor import INFO_SERVIDOR, VERSION_PROTOCOLO, ServidorMCP
 
@@ -47,6 +50,11 @@ TAMANO_MAXIMO = 1_000_000  # 1 MB de cuerpo: una petición JSON-RPC legítima no
 #: Directorio de ficheros estáticos (el cliente en el navegador). Si está, el mismo proceso
 #: sirve el MCP y la página, así que comparten origen y no hace falta CORS entre ellos.
 DIRECTORIO_ESTATICOS: Path | None = None
+
+#: Modelo alojado para `POST /chat`. `None` si no hay clave: la ruta responde 503 y la página
+#: solo ofrece el modelo del navegador. Se rellena en `principal()`.
+CLIENTE_CHAT: chat.ClienteModelo | None = None
+LIMITADOR_CHAT: chat.Limitador = chat.limitador_desde_entorno()
 
 _local = threading.local()
 
@@ -93,6 +101,10 @@ class Manejador(BaseHTTPRequestHandler):
                 "ciudades": [f["municipio"] for f in estadisticas["por_portal"]],
                 "sin_licencia_declarada": estadisticas["sin_licencia"],
                 "ultima_sincronizacion": ultima["valor"] if ultima else None,
+                "chat": {"disponible": True, "modelo": CLIENTE_CHAT.modelo,
+                         "limite_por_ip": LIMITADOR_CHAT.por_ip,
+                         "ventana_segundos": int(LIMITADOR_CHAT.ventana)}
+                if CLIENTE_CHAT else {"disponible": False},
             })
         elif self.path.rstrip("/") == "/mcp" or (
             self.path.rstrip("/") == "" and DIRECTORIO_ESTATICOS is None
@@ -112,7 +124,8 @@ class Manejador(BaseHTTPRequestHandler):
         elif self._servir_estatico():
             return
         else:
-            self._responder(404, {"error": "no existe esa ruta", "rutas": ["/", "/mcp", "/salud"]})
+            self._responder(404, {"error": "no existe esa ruta",
+                                  "rutas": ["/", "/mcp", "/salud", "POST /chat"]})
 
     def _servir_estatico(self) -> bool:
         """Sirve la página del navegador. Devuelve False si no hay nada que servir.
@@ -152,20 +165,70 @@ class Manejador(BaseHTTPRequestHandler):
         self.wfile.write(datos)
         return True
 
-    def do_POST(self):  # noqa: N802
-        if self.path.rstrip("/") not in ("/mcp", ""):
-            self._responder(404, {"error": "usa POST /mcp"})
-            return
+    def _leer_json(self) -> object | None:
+        """Cuerpo JSON de la petición, o `None` tras haber respondido ya con el error."""
         longitud = int(self.headers.get("Content-Length") or 0)
         if longitud > TAMANO_MAXIMO:
             self._responder(413, {"jsonrpc": "2.0", "id": None,
                                   "error": {"code": -32600, "message": "cuerpo demasiado grande"}})
-            return
+            return None
         try:
-            peticion = json.loads(self.rfile.read(longitud) or b"{}")
+            return json.loads(self.rfile.read(longitud) or b"{}")
         except json.JSONDecodeError as exc:
             self._responder(400, {"jsonrpc": "2.0", "id": None,
                                   "error": {"code": -32700, "message": f"JSON mal formado: {exc}"}})
+            return None
+
+    def _ip_cliente(self) -> str:
+        """Detrás de Traefik la IP real viene en X-Forwarded-For; en local, la del socket."""
+        reenviada = self.headers.get("X-Forwarded-For")
+        if reenviada:
+            return reenviada.split(",")[0].strip()
+        return self.client_address[0]
+
+    def _chat(self) -> None:
+        if CLIENTE_CHAT is None:
+            self._responder(503, {"error": "el chat alojado no está configurado en este servidor; "
+                                           "usa el modelo del navegador o conecta el MCP a tu agente"})
+            return
+        motivo = LIMITADOR_CHAT.permitir(self._ip_cliente())
+        if motivo:
+            self._responder(429, {"error": motivo})
+            return
+        cuerpo = self._leer_json()
+        if cuerpo is None:
+            return
+        try:
+            historial = chat.validar_mensajes((cuerpo or {}).get("messages")
+                                              if isinstance(cuerpo, dict) else None)
+        except ValueError as exc:
+            self._responder(400, {"error": str(exc)})
+            return
+
+        # SSE: un `data:` por evento. Sin Content-Length; la conexión se cierra al terminar.
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("X-Accel-Buffering", "no")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        almacen = _servidor_del_hilo().almacen
+        try:
+            for evento in chat.conversar(almacen, historial, CLIENTE_CHAT):
+                self.wfile.write(f"data: {json.dumps(evento, ensure_ascii=False)}\n\n".encode())
+                self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError):
+            pass  # el navegador cerró la pestaña a medias; no hay a quién avisar
+
+    def do_POST(self):  # noqa: N802
+        if self.path.rstrip("/") == "/chat":
+            self._chat()
+            return
+        if self.path.rstrip("/") not in ("/mcp", ""):
+            self._responder(404, {"error": "usa POST /mcp o POST /chat"})
+            return
+        peticion = self._leer_json()
+        if peticion is None:
             return
 
         servidor = _servidor_del_hilo()
@@ -196,6 +259,9 @@ def principal(argv: list[str] | None = None) -> int:
             print(f"No existe el directorio de estáticos: {DIRECTORIO_ESTATICOS}", file=sys.stderr)
             return 1
 
+    global CLIENTE_CHAT
+    CLIENTE_CHAT = chat.cliente_desde_entorno()
+
     if not cfg.RUTA_INDICE.exists():
         print(f"No hay índice en {cfg.RUTA_INDICE}. Ejecuta: python -m tfm.index build",
               file=sys.stderr)
@@ -204,7 +270,9 @@ def principal(argv: list[str] | None = None) -> int:
     servidor = ThreadingHTTPServer((args.host, args.puerto), Manejador)
     print(f"[tfm.mcp.http] http://{args.host}:{args.puerto}/mcp · "
           f"{len(CATALOGO)} herramientas · índice {cfg.RUTA_INDICE}"
-          + (f" · web {DIRECTORIO_ESTATICOS}" if DIRECTORIO_ESTATICOS else ""), file=sys.stderr)
+          + (f" · web {DIRECTORIO_ESTATICOS}" if DIRECTORIO_ESTATICOS else "")
+          + (f" · chat con {CLIENTE_CHAT.modelo}" if CLIENTE_CHAT else " · sin chat alojado"),
+          file=sys.stderr)
     try:
         servidor.serve_forever()
     except KeyboardInterrupt:

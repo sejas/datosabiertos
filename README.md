@@ -1,7 +1,8 @@
 # datosabiertos — un agente MCP sobre catálogos municipales españoles
 
 [![Tests](https://github.com/sejas/datosabiertos/actions/workflows/tests.yml/badge.svg)](https://github.com/sejas/datosabiertos/actions/workflows/tests.yml)
-[![Cliente web](https://img.shields.io/badge/demo-sejas.github.io%2Fdatosabiertos-1d5c8f)](https://sejas.github.io/datosabiertos/)
+[![Demo](https://img.shields.io/badge/demo-datosabiertos.sejas.es-1d5c8f)](https://datosabiertos.sejas.es/)
+[![MCP](https://img.shields.io/badge/MCP-datosabiertos.sejas.es%2Fmcp-17614a)](https://datosabiertos.sejas.es/mcp)
 [![Licencia MIT](https://img.shields.io/badge/c%C3%B3digo-MIT-17614a)](LICENSE)
 
 Preguntar en lenguaje natural —*«¿qué datos hay sobre calidad del aire en Málaga desde
@@ -14,12 +15,17 @@ Este repositorio contiene tres piezas que funcionan hoy:
    datasets** y **23.390 distribuciones**.
 2. Un **servidor MCP** con cuatro herramientas sobre ese índice, con transporte *stdio* y
    HTTP. Cero dependencias: solo la biblioteca estándar de Python.
-3. Un **cliente web** que abre el índice dentro del navegador con sql.js y, opcionalmente,
-   ejecuta un modelo pequeño por WebGPU. Sin servidor y sin coste de inferencia.
+3. Un **cliente web** con chat y dos motores intercambiables: un modelo alojado (OpenRouter,
+   *tool calling* nativo, bucle de agente en el servidor) o un modelo pequeño que corre en el
+   propio navegador por WebGPU. La búsqueda directa, sin modelo, abre el índice en el
+   navegador con sql.js y funciona siempre.
 
-> **Demo:** <https://sejas.github.io/datosabiertos/> — el índice (3,4 MB comprimidos) se
-> descarga al navegador y se consulta ahí. El modo directo funciona en cualquier navegador
-> moderno; el modo agente necesita WebGPU (Chrome o Edge).
+> **Demo:** <https://datosabiertos.sejas.es/> — chat, búsqueda directa y las instrucciones
+> para conectar el MCP a Claude Code, Codex, Claude Desktop, Cursor o VS Code.
+>
+> **MCP público:** `https://datosabiertos.sejas.es/mcp` (Streamable HTTP, sin autenticación,
+> solo lectura). Una línea en Claude Code:
+> `claude mcp add --transport http datosabiertos https://datosabiertos.sejas.es/mcp`
 
 ## Estado
 
@@ -30,7 +36,7 @@ conviene leerlo como tal:
 |---|---|
 | Portales indexados | Madrid, Barcelona, Málaga, Córdoba y Reus |
 | Última sincronización del índice publicado | 25/07/2026 |
-| Tests | 41, sin red |
+| Tests | 59, sin red |
 | Banco de evaluación | 15 preguntas de las 80–120 previstas |
 | Evaluación de modelos | **todavía no ejecutada** |
 
@@ -57,7 +63,21 @@ python -m tfm.mcp.http --puerto 8080 --estaticos web   # MCP en POST /mcp + clie
 docker compose up -d --build                            # lo mismo, empaquetado
 ```
 
-`GET /salud` devuelve recuentos y fecha de sincronización.
+`GET /salud` devuelve recuentos, fecha de sincronización y si el chat alojado está activo.
+
+El chat alojado (`POST /chat`) solo se activa si hay clave de OpenRouter; sin ella la página
+ofrece únicamente el motor del navegador. Variables de entorno (todas opcionales):
+
+| Variable | Por defecto | Para qué |
+|---|---|---|
+| `OPENROUTER_API_KEY` | — | Activa el chat alojado |
+| `TFM_MODELO_CHAT` | `meta/muse-spark-1.3-contributor` | Modelo (cualquiera de OpenRouter con `tools`) |
+| `TFM_URL_MODELO` | OpenRouter | Cualquier API compatible con OpenAI (Ollama, vLLM…) |
+| `TFM_CHAT_LIMITE_IP` / `TFM_CHAT_VENTANA` | 20 / 600 s | Tope por dirección IP |
+| `TFM_CHAT_LIMITE_DIA` | 500 | Tope diario global: es dinero de quien aloja |
+
+`./deploy.sh` sincroniza el árbol de trabajo (índice incluido) con el servidor y reconstruye
+el contenedor; el `.env` con estas variables vive solo en el servidor.
 
 ## Herramientas MCP
 
@@ -71,8 +91,10 @@ docker compose up -d --build                            # lo mismo, empaquetado
 `consultar_sparql` se dejó fuera a propósito: el índice es SQLite, no un *triplestore*. El
 razonamiento está en [`docs/03-prior-art.md`](docs/03-prior-art.md) §5.5.
 
-Para usarlo desde Claude Desktop, Claude Code o cualquier cliente MCP, y para las decisiones
-de diseño del servidor: [`tfm/mcp/README.md`](tfm/mcp/README.md).
+Para conectarlo a Claude Code, Codex, Claude Desktop, Cursor o VS Code —por HTTP contra el
+servidor público o por *stdio* en local— y para las decisiones de diseño del servidor:
+[`tfm/mcp/README.md`](tfm/mcp/README.md). Las mismas instrucciones, con botones de copiar,
+están en la sección «Conecta tu agente» de la [demo](https://datosabiertos.sejas.es/#conectar).
 
 ## Lo que hemos aprendido midiendo
 
@@ -97,12 +119,12 @@ con `TFM_RESPETAR_DISALLOW=1` se aplica la lectura estricta.
 ```
 tfm/            Índice local y servidor MCP (Python, sin dependencias)
   conectores/   Un módulo por familia de portal; añadir uno son 3 pasos
-  mcp/          Herramientas, transporte stdio y transporte HTTP
-web/            Cliente del navegador: sql.js + WebLLM, sin servidor
+  mcp/          Herramientas, transporte stdio, transporte HTTP y chat con modelo alojado
+web/            Cliente del navegador: chat (servidor o WebLLM), búsqueda directa y guía MCP
 bench/          Banco de evaluación en español: esquema, validador y preguntas
 docs/           Análisis de catálogos, prior art y notas de diseño
 research/       Scripts exploratorios y datos de la fase de análisis
-tests/          41 tests, sin red
+tests/          59 tests, sin red
 ```
 
 Empieza por [`docs/README.md`](docs/README.md) para el hilo conductor de los documentos.

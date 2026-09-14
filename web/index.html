@@ -3,122 +3,403 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Datos abiertos municipales · agente en el navegador (TFM)</title>
-<meta name="description" content="Pregunta en lenguaje natural sobre catálogos municipales españoles de datos abiertos. El índice y el modelo corren en tu navegador.">
+<title>Datos abiertos municipales · pregunta a los catálogos</title>
+<meta name="description" content="Pregunta en lenguaje natural sobre los catálogos de datos abiertos de Madrid, Barcelona, Málaga, Córdoba y Reus. Un agente que cita el dataset real o dice que no existe. Servidor MCP público.">
+<meta name="color-scheme" content="light dark">
 <style>
   :root {
-    --tinta: #16202a; --tenue: #5d6b7a; --linea: #dfe5ea; --fondo: #fbfcfd;
-    --panel: #fff; --acento: #1d5c8f; --alerta: #9a3d12; --ok: #17614a;
-    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+    --tinta: #16202a; --tenue: #5d6b7a; --linea: #dfe5ea; --fondo: #f5f7f9;
+    --panel: #ffffff; --panel-2: #f0f3f6; --acento: #1d5c8f; --acento-tenue: #e6f0f8;
+    --alerta: #9a3d12; --alerta-tenue: #fbeee6; --ok: #17614a; --ok-tenue: #e4f3ec;
+    --burbuja: #1d5c8f; --burbuja-texto: #ffffff;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sombra: 0 1px 2px rgba(22,32,42,.06), 0 4px 16px rgba(22,32,42,.05);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --tinta: #e6edf3; --tenue: #9aa8b6; --linea: #2a3541; --fondo: #11161c;
-      --panel: #171e26; --acento: #6fb2e8; --alerta: #e8a37a; --ok: #6cc7a6;
+      --tinta: #e6edf3; --tenue: #9aa8b6; --linea: #2a3541; --fondo: #0f1419;
+      --panel: #171e26; --panel-2: #1e2732; --acento: #6fb2e8; --acento-tenue: #1a2a3a;
+      --alerta: #e8a37a; --alerta-tenue: #2e1f16; --ok: #6cc7a6; --ok-tenue: #14291f;
+      --burbuja: #2b5f8c; --burbuja-texto: #f4f8fb;
+      --sombra: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.25);
     }
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    margin: 0; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
-    color: var(--tinta); background: var(--fondo);
+    margin: 0; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--tinta); background: var(--fondo); -webkit-font-smoothing: antialiased;
   }
-  header { border-bottom: 1px solid var(--linea); padding: 1.1rem 1rem; background: var(--panel); }
-  .contenedor { max-width: 62rem; margin: 0 auto; padding: 0 1rem; }
-  h1 { margin: 0 0 .2rem; font-size: 1.15rem; letter-spacing: -.01em; }
-  header p { margin: 0; color: var(--tenue); font-size: .87rem; }
-  main { padding: 1.4rem 0 4rem; }
-  fieldset { border: 1px solid var(--linea); border-radius: 10px; padding: 1rem; margin: 0 0 1.2rem; background: var(--panel); }
-  legend { padding: 0 .4rem; font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--tenue); }
-  label { display: block; font-size: .82rem; color: var(--tenue); margin-bottom: .25rem; }
-  input[type=text], select {
+  a { color: var(--acento); }
+  code, pre, kbd { font-family: var(--mono); font-size: .86em; }
+  .contenedor { max-width: 60rem; margin: 0 auto; padding: 0 1rem; }
+  .oculto { display: none !important; }
+  .visualmente-oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* Cabecera ------------------------------------------------------------------------- */
+  header.cabecera { background: var(--panel); border-bottom: 1px solid var(--linea); }
+  .cabecera .contenedor { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.5rem; padding-block: .9rem; }
+  .marca { display: flex; align-items: center; gap: .6rem; font-weight: 700; letter-spacing: -.01em; text-decoration: none; color: var(--tinta); }
+  .marca .logo { width: 1.7rem; height: 1.7rem; border-radius: 7px; background: var(--acento); color: #fff; display: grid; place-items: center; font-size: .95rem; font-family: var(--mono); }
+  nav.principal { display: flex; gap: .2rem; flex-wrap: wrap; margin-left: auto; }
+  nav.principal a { text-decoration: none; color: var(--tenue); padding: .35rem .6rem; border-radius: 6px; font-size: .9rem; }
+  nav.principal a:hover { background: var(--panel-2); color: var(--tinta); }
+
+  .portada { padding: 2.2rem 0 1.4rem; }
+  .portada h1 { font-size: clamp(1.5rem, 3.6vw, 2.15rem); line-height: 1.2; margin: 0 0 .6rem; letter-spacing: -.02em; }
+  .portada p { margin: 0; max-width: 46rem; color: var(--tenue); font-size: 1.02rem; }
+  .cifras { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+  .cifras span { font-size: .8rem; color: var(--tenue); background: var(--panel); border: 1px solid var(--linea); border-radius: 999px; padding: .25rem .7rem; }
+  .cifras strong { color: var(--tinta); font-weight: 600; }
+
+  /* Paneles -------------------------------------------------------------------------- */
+  section.panel { background: var(--panel); border: 1px solid var(--linea); border-radius: 14px; box-shadow: var(--sombra); margin: 0 0 1.6rem; scroll-margin-top: 1rem; }
+  .panel-cabecera { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; padding: .9rem 1.1rem; border-bottom: 1px solid var(--linea); }
+  .panel-cabecera h2 { margin: 0; font-size: 1.05rem; letter-spacing: -.01em; }
+  .panel-cabecera .sub { color: var(--tenue); font-weight: 400; font-size: .85rem; margin-left: .4rem; }
+  .panel-cuerpo { padding: 1.1rem; }
+  .fila { display: flex; gap: .6rem; align-items: flex-end; flex-wrap: wrap; }
+  .fila > :first-child { flex: 1 1 16rem; }
+  label { display: block; font-size: .78rem; color: var(--tenue); margin-bottom: .25rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+  input[type=text], select, textarea {
     width: 100%; padding: .6rem .7rem; font: inherit; color: var(--tinta);
-    background: var(--fondo); border: 1px solid var(--linea); border-radius: 7px;
+    background: var(--fondo); border: 1px solid var(--linea); border-radius: 8px;
   }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
   button {
-    font: inherit; font-weight: 600; padding: .6rem 1.1rem; border-radius: 7px; cursor: pointer;
-    background: var(--acento); color: #fff; border: 1px solid transparent;
+    font: inherit; font-weight: 600; padding: .6rem 1.1rem; border-radius: 8px; cursor: pointer;
+    background: var(--acento); color: #fff; border: 1px solid transparent; white-space: nowrap;
   }
   button.secundario { background: transparent; color: var(--acento); border-color: var(--linea); }
+  button.secundario:hover { background: var(--acento-tenue); }
   button:disabled { opacity: .5; cursor: not-allowed; }
-  .fila { display: flex; gap: .6rem; align-items: flex-end; flex-wrap: wrap; }
-  .fila > :first-child { flex: 1 1 18rem; }
-  .ejemplos { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .7rem; }
-  .ejemplos button { background: transparent; color: var(--tenue); border: 1px dashed var(--linea); font-weight: 400; font-size: .82rem; padding: .3rem .6rem; }
-  #estado { font-size: .85rem; color: var(--tenue); margin: .6rem 0 0; }
-  progress { width: 100%; height: 5px; }
-  .tarjeta { border: 1px solid var(--linea); border-left: 3px solid var(--acento); border-radius: 7px; padding: .75rem .9rem; margin-bottom: .7rem; background: var(--panel); }
-  .tarjeta h3 { margin: 0 0 .25rem; font-size: .97rem; }
-  .tarjeta p { margin: 0 0 .4rem; font-size: .87rem; color: var(--tenue); }
-  .meta { font-size: .76rem; color: var(--tenue); display: flex; gap: .8rem; flex-wrap: wrap; font-family: var(--mono); }
-  .sin-licencia { border-left-color: var(--alerta); }
+  .chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .chips button { background: var(--panel-2); color: var(--tinta); border: 1px solid var(--linea); font-weight: 400; font-size: .84rem; padding: .35rem .7rem; border-radius: 999px; white-space: normal; text-align: left; }
+  .chips button:hover { border-color: var(--acento); color: var(--acento); }
+  .aviso { font-size: .84rem; color: var(--tenue); border-left: 3px solid var(--linea); padding-left: .7rem; margin: .8rem 0 0; }
+  .aviso.alerta { border-color: var(--alerta); color: var(--alerta); }
+  progress { width: 100%; height: 5px; accent-color: var(--acento); }
+
+  /* Chat ----------------------------------------------------------------------------- */
+  .motor { display: flex; align-items: center; gap: .5rem; margin-left: auto; flex-wrap: wrap; }
+  .motor select { width: auto; padding: .4rem .6rem; font-size: .9rem; }
+  .motor button { padding: .4rem .8rem; font-size: .88rem; }
+  #panel-motor { padding: .8rem 1.1rem; background: var(--panel-2); border-bottom: 1px solid var(--linea); font-size: .87rem; color: var(--tenue); }
+  #panel-motor .fila { margin-top: .5rem; }
+  #panel-motor progress { margin-top: .5rem; }
+  .mensajes { padding: 1.1rem; display: flex; flex-direction: column; gap: 1rem; min-height: 14rem; max-height: 68vh; overflow-y: auto; }
+  .bienvenida { color: var(--tenue); font-size: .95rem; }
+  .bienvenida p { margin: 0 0 .7rem; }
+  .mensaje { display: flex; flex-direction: column; gap: .5rem; max-width: 100%; }
+  .mensaje.usuario { align-items: flex-end; }
+  .burbuja { padding: .6rem .9rem; border-radius: 14px; max-width: 42rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .usuario .burbuja { background: var(--burbuja); color: var(--burbuja-texto); border-bottom-right-radius: 4px; }
+  .asistente .texto { padding: .1rem 0; max-width: 46rem; }
+  .asistente .texto p { margin: 0 0 .6rem; }
+  .asistente .texto p:last-child { margin-bottom: 0; }
+  .asistente .texto ul, .asistente .texto ol { margin: 0 0 .6rem; padding-left: 1.3rem; }
+  .asistente .texto code { background: var(--panel-2); padding: .05em .3em; border-radius: 4px; }
+  .asistente .texto a { overflow-wrap: anywhere; }
+  .paso { border: 1px solid var(--linea); border-radius: 10px; background: var(--panel-2); font-size: .84rem; max-width: 46rem; }
+  .paso summary { cursor: pointer; padding: .5rem .75rem; display: flex; flex-wrap: wrap; gap: .4rem .7rem; align-items: center; list-style: none; }
+  .paso summary::-webkit-details-marker { display: none; }
+  .paso summary::before { content: "▸"; color: var(--tenue); font-size: .8rem; }
+  .paso[open] summary::before { content: "▾"; }
+  .paso .nombre { font-family: var(--mono); color: var(--acento); font-weight: 600; }
+  .paso .args { font-family: var(--mono); color: var(--tenue); overflow-wrap: anywhere; }
+  .paso .cuenta { margin-left: auto; color: var(--tenue); white-space: nowrap; }
+  .paso .cuenta.error { color: var(--alerta); }
+  .paso .cuerpo { padding: 0 .75rem .75rem; max-height: 24rem; overflow-y: auto; }
+  .paso .cuerpo .aviso { margin: 0 0 .5rem; }
+  .paso pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem; color: var(--tenue); max-height: 16rem; overflow: auto; }
+  .pensando { color: var(--tenue); font-size: .88rem; display: inline-flex; gap: .4rem; align-items: center; }
+  .pensando::after { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--acento); animation: latido 1s infinite ease-in-out; }
+  @keyframes latido { 0%, 100% { opacity: .2; transform: scale(.7); } 50% { opacity: 1; transform: scale(1); } }
+  .error-chat { color: var(--alerta); background: var(--alerta-tenue); border-radius: 10px; padding: .6rem .9rem; font-size: .9rem; max-width: 46rem; }
+  .compositor { display: flex; gap: .6rem; padding: .9rem 1.1rem; border-top: 1px solid var(--linea); align-items: flex-end; }
+  .compositor textarea { resize: none; min-height: 2.8rem; max-height: 10rem; line-height: 1.45; }
+  .pie-chat { padding: 0 1.1rem .9rem; font-size: .78rem; color: var(--tenue); }
+
+  /* Fichas de dataset ---------------------------------------------------------------- */
+  .fichas { display: grid; gap: .55rem; margin-top: .5rem; }
+  .tarjeta { border: 1px solid var(--linea); border-left: 3px solid var(--acento); border-radius: 8px; padding: .65rem .85rem; background: var(--panel); }
+  .tarjeta h3 { margin: 0 0 .25rem; font-size: .95rem; line-height: 1.35; }
+  .tarjeta p { margin: 0 0 .4rem; font-size: .85rem; color: var(--tenue); }
+  .meta { font-size: .75rem; color: var(--tenue); display: flex; gap: .3rem .8rem; flex-wrap: wrap; font-family: var(--mono); }
+  .tarjeta.sin-licencia { border-left-color: var(--alerta); }
   .insignia { color: var(--alerta); font-weight: 700; }
-  a { color: var(--acento); }
-  .traza { font-family: var(--mono); font-size: .78rem; background: var(--fondo); border: 1px solid var(--linea); border-radius: 7px; padding: .6rem .7rem; margin-bottom: .7rem; white-space: pre-wrap; overflow-x: auto; }
-  .respuesta { border: 1px solid var(--linea); border-radius: 7px; padding: .9rem; background: var(--panel); white-space: pre-wrap; }
-  details { margin-top: .5rem; font-size: .84rem; }
-  .aviso { font-size: .82rem; color: var(--tenue); border-left: 3px solid var(--linea); padding-left: .7rem; margin: .8rem 0 0; }
-  .oculto { display: none; }
+  .insignia.ok { color: var(--ok); font-weight: 500; }
+
+  /* Conectar ------------------------------------------------------------------------- */
+  .endpoint { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; background: var(--panel-2); border: 1px solid var(--linea); border-radius: 10px; padding: .6rem .8rem; margin: 0 0 1rem; }
+  .endpoint code { font-size: .95rem; color: var(--acento); overflow-wrap: anywhere; }
+  .endpoint .metodo { font-size: .72rem; font-weight: 700; color: var(--ok); background: var(--ok-tenue); padding: .15rem .45rem; border-radius: 4px; letter-spacing: .05em; }
+  .pestanas { display: flex; flex-wrap: wrap; gap: .3rem; border-bottom: 1px solid var(--linea); margin-bottom: 1rem; }
+  .pestanas button { background: transparent; color: var(--tenue); border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: .5rem .8rem; font-weight: 500; margin-bottom: -1px; }
+  .pestanas button[aria-selected=true] { color: var(--acento); border-bottom-color: var(--acento); font-weight: 600; }
+  .pestana ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+  .pestana li { margin-bottom: .7rem; }
+  .pestana li > p { margin: 0 0 .4rem; }
+  .codigo { position: relative; margin: .4rem 0 0; }
+  .codigo pre { margin: 0; background: #0f1419; color: #e6edf3; border-radius: 8px; padding: .75rem 5.2rem .75rem .9rem; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .82rem; line-height: 1.5; }
+  @media (prefers-color-scheme: dark) { .codigo pre { background: #0b0f14; border: 1px solid var(--linea); } }
+  .codigo .copiar { position: absolute; top: .45rem; right: .45rem; font-size: .74rem; padding: .25rem .55rem; background: rgba(255,255,255,.12); color: #e6edf3; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; font-weight: 500; }
+  .codigo .copiar:hover { background: rgba(255,255,255,.22); }
+  .nota-cliente { font-size: .85rem; color: var(--tenue); margin: 0 0 .6rem; }
+  .prompt-sugerido { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--linea); }
+  .prompt-sugerido h3 { margin: 0 0 .3rem; font-size: .95rem; }
+  .prompt-sugerido .codigo pre { white-space: pre-wrap; font-family: inherit; font-size: .9rem; }
+  .contrato { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .6rem; margin-top: 1.2rem; }
+  .contrato div { background: var(--panel-2); border-radius: 8px; padding: .6rem .8rem; font-size: .84rem; }
+  .contrato strong { display: block; font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; color: var(--tenue); margin-bottom: .15rem; }
+
+  footer { padding: 1rem 0 3rem; color: var(--tenue); font-size: .84rem; }
+  footer p { margin: 0 0 .6rem; max-width: 50rem; }
+
+  @media (max-width: 640px) {
+    .mensajes { max-height: none; }
+    .burbuja { max-width: 100%; }
+    .panel-cabecera .motor { margin-left: 0; width: 100%; }
+    .motor select { flex: 1; }
+    .codigo pre { padding: 2.3rem .9rem .75rem; }
+  }
 </style>
 </head>
 <body>
-<header><div class="contenedor">
-  <h1>Datos abiertos municipales · agente en el navegador</h1>
-  <p>Índice local de catálogos DCAT de ayuntamientos españoles. Prototipo del TFM
-     (MUIA-UPM, dir. Óscar Corcho). <span id="resumen-indice">cargando el índice…</span></p>
-</div></header>
+
+<header class="cabecera">
+  <div class="contenedor">
+    <a class="marca" href="#"><span class="logo">{}</span>datosabiertos</a>
+    <nav class="principal" aria-label="Secciones">
+      <a href="#chat">Chat</a>
+      <a href="#buscar">Buscar</a>
+      <a href="#conectar">Conecta tu agente</a>
+      <a href="https://github.com/sejas/datosabiertos" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
 
 <main class="contenedor">
 
-  <fieldset>
-    <legend>Modo directo · funciona siempre, sin modelo</legend>
-    <div class="fila">
-      <div>
-        <label for="q">Qué buscas</label>
-        <input type="text" id="q" placeholder="calidad del aire" autocomplete="off">
-      </div>
-      <div style="flex:0 1 12rem">
-        <label for="ciudad">Ciudad</label>
-        <select id="ciudad"><option value="">todas</option></select>
-      </div>
-      <button id="btn-buscar">Buscar</button>
-    </div>
-    <div class="ejemplos" id="ejemplos-directo"></div>
-    <p id="estado">Descargando el índice (3,4 MB comprimidos)…</p>
-    <progress id="barra" max="100" value="0"></progress>
-    <div id="resultados"></div>
-  </fieldset>
+  <div class="portada">
+    <h1>Pregunta a los catálogos de datos abiertos de cinco ayuntamientos.</h1>
+    <p>Un agente que busca en los metadatos DCAT de Madrid, Barcelona, Málaga, Córdoba y Reus
+       y responde <strong>citando el dataset real</strong> con su enlace al portal — o dice
+       que no existe. También es un servidor MCP público que puedes conectar a Claude, Codex
+       o cualquier otro agente.</p>
+    <div class="cifras" id="cifras"><span>cargando el índice…</span></div>
+  </div>
 
-  <fieldset>
-    <legend>Modo agente · modelo pequeño en tu navegador (WebGPU)</legend>
-    <p class="aviso" id="aviso-webgpu">Comprobando si tu navegador tiene WebGPU…</p>
-    <div class="fila" id="controles-modelo">
-      <div>
-        <label for="modelo">Modelo (se descarga una vez y queda en caché del navegador)</label>
-        <select id="modelo"></select>
+  <!-- Chat --------------------------------------------------------------------------- -->
+  <section class="panel" id="chat" aria-labelledby="titulo-chat">
+    <div class="panel-cabecera">
+      <h2 id="titulo-chat">Chat</h2>
+      <div class="motor">
+        <label for="motor" class="visualmente-oculto">Motor</label>
+        <select id="motor">
+          <option value="servidor">Servidor · modelo alojado</option>
+          <option value="navegador">Tu navegador · WebLLM (WebGPU)</option>
+        </select>
+        <button id="btn-nueva" class="secundario" type="button">Nueva conversación</button>
       </div>
-      <button id="btn-cargar" class="secundario" disabled>Cargar modelo</button>
     </div>
-    <progress id="barra-modelo" max="100" value="0" class="oculto"></progress>
-    <p id="estado-modelo"></p>
-    <div class="fila" style="margin-top:.9rem">
-      <div>
-        <label for="pregunta">Pregunta en lenguaje natural</label>
-        <input type="text" id="pregunta" placeholder="¿Qué datos hay sobre calidad del aire en Málaga?" disabled autocomplete="off">
-      </div>
-      <button id="btn-preguntar" disabled>Preguntar</button>
-    </div>
-    <div class="ejemplos" id="ejemplos-agente"></div>
-    <div id="traza"></div>
-    <div id="respuesta"></div>
-  </fieldset>
 
-  <p class="aviso">
-    Los metadatos son copias de los portales municipales, no la fuente viva: cada resultado
-    lleva su <code>url_origen</code> y su fecha de sincronización. Los datasets cuyo portal no
-    declara licencia salen marcados como <span class="insignia">licencia no declarada</span>;
-    no se asume que sean abiertos. Código y método:
-    <a href="https://github.com/asejas/tfm-mcp-datos-abiertos">repositorio del TFM</a>.
-  </p>
+    <div id="panel-motor">
+      <div id="motor-servidor">
+        <span id="texto-servidor">Comprobando el servidor…</span>
+      </div>
+      <div id="motor-navegador" class="oculto">
+        <span id="texto-navegador">Comprobando si tu navegador tiene WebGPU…</span>
+        <div class="fila" id="controles-modelo">
+          <div>
+            <label for="modelo">Modelo (se descarga una vez y queda en la caché del navegador)</label>
+            <select id="modelo"></select>
+          </div>
+          <button id="btn-cargar" class="secundario" type="button" disabled>Cargar modelo</button>
+        </div>
+        <progress id="barra-modelo" max="100" value="0" class="oculto"></progress>
+        <p id="estado-modelo" style="margin:.4rem 0 0"></p>
+      </div>
+    </div>
+
+    <div class="mensajes" id="mensajes" aria-live="polite">
+      <div class="bienvenida" id="bienvenida">
+        <p>Pregunta en español (o en catalán para Barcelona y Reus). Verás cada llamada a las
+           herramientas antes de la respuesta: es la traza que permite comprobar de dónde sale
+           cada dato.</p>
+        <div class="chips" id="ejemplos-chat"></div>
+      </div>
+    </div>
+
+    <form class="compositor" id="compositor">
+      <label for="pregunta" class="visualmente-oculto">Tu pregunta</label>
+      <textarea id="pregunta" rows="1" placeholder="¿Qué datos hay sobre calidad del aire en Málaga?" autocomplete="off"></textarea>
+      <button id="btn-enviar" type="submit">Enviar</button>
+    </form>
+    <p class="pie-chat" id="pie-chat"></p>
+  </section>
+
+  <!-- Búsqueda directa --------------------------------------------------------------- -->
+  <section class="panel" id="buscar" aria-labelledby="titulo-buscar">
+    <div class="panel-cabecera">
+      <h2 id="titulo-buscar">Búsqueda directa <span class="sub">sin modelo · el punto de referencia</span></h2>
+    </div>
+    <div class="panel-cuerpo">
+      <div class="fila">
+        <div>
+          <label for="q">Qué buscas</label>
+          <input type="text" id="q" placeholder="calidad del aire" autocomplete="off">
+        </div>
+        <div style="flex:0 1 12rem">
+          <label for="ciudad">Ciudad</label>
+          <select id="ciudad"><option value="">todas</option></select>
+        </div>
+        <button id="btn-buscar" type="button">Buscar</button>
+      </div>
+      <div class="chips" id="ejemplos-directo" style="margin-top:.7rem"></div>
+      <p class="aviso" id="estado">Descargando el índice (3,4 MB comprimidos)…</p>
+      <progress id="barra" max="100" value="0"></progress>
+      <div class="fichas" id="resultados"></div>
+    </div>
+  </section>
+
+  <!-- Conectar ----------------------------------------------------------------------- -->
+  <section class="panel" id="conectar" aria-labelledby="titulo-conectar">
+    <div class="panel-cabecera">
+      <h2 id="titulo-conectar">Conecta el MCP a tu agente</h2>
+      <span class="sub">Las mismas cuatro herramientas, con tu modelo y sin coste para nadie más</span>
+    </div>
+    <div class="panel-cuerpo">
+      <div class="endpoint">
+        <span class="metodo">POST</span>
+        <code id="url-mcp">https://datosabiertos.sejas.es/mcp</code>
+        <span style="color:var(--tenue);font-size:.84rem">· Streamable HTTP · JSON-RPC 2.0 · sin autenticación · solo lectura</span>
+      </div>
+
+      <div class="pestanas" role="tablist" id="pestanas">
+        <button role="tab" data-pestana="claude-code" aria-selected="true" type="button">Claude Code</button>
+        <button role="tab" data-pestana="codex" aria-selected="false" type="button">Codex CLI</button>
+        <button role="tab" data-pestana="claude-desktop" aria-selected="false" type="button">Claude Desktop</button>
+        <button role="tab" data-pestana="editores" aria-selected="false" type="button">Cursor · VS Code · Gemini CLI</button>
+        <button role="tab" data-pestana="curl" aria-selected="false" type="button">curl</button>
+      </div>
+
+      <div class="pestana" data-pestana="claude-code" role="tabpanel">
+        <ol>
+          <li><p>Registra el servidor (una vez; <code>--scope user</code> para tenerlo en todos tus proyectos):</p>
+            <div class="codigo"><pre>claude mcp add --transport http --scope user datosabiertos https://datosabiertos.sejas.es/mcp</pre></div></li>
+          <li><p>Comprueba que conecta:</p>
+            <div class="codigo"><pre>claude mcp list
+# datosabiertos: https://datosabiertos.sejas.es/mcp (HTTP) - ✔ Connected</pre></div></li>
+          <li><p>Abre <code>claude</code> y pregunta. Dentro de la sesión, <code>/mcp</code> muestra las herramientas. Para usarlo sin confirmación en modo no interactivo:</p>
+            <div class="codigo"><pre>claude -p --allowedTools "mcp__datosabiertos__*" "¿Qué publica Córdoba sobre presupuestos y con qué licencia?"</pre></div></li>
+        </ol>
+        <p class="nota-cliente">Probado con Claude Code 2.1: conecta, lista las cuatro herramientas y las llama sin ningún ajuste.</p>
+      </div>
+
+      <div class="pestana oculto" data-pestana="codex" role="tabpanel">
+        <ol>
+          <li><p>Añade el servidor (Codex CLI ≥ 0.20 admite servidores <em>streamable HTTP</em> con <code>--url</code>):</p>
+            <div class="codigo"><pre>codex mcp add datosabiertos --url https://datosabiertos.sejas.es/mcp</pre></div></li>
+          <li><p>O escríbelo a mano en <code>~/.codex/config.toml</code>; es exactamente lo que genera el comando anterior:</p>
+            <div class="codigo"><pre>[mcp_servers.datosabiertos]
+url = "https://datosabiertos.sejas.es/mcp"</pre></div></li>
+          <li><p>Comprueba con <code>codex mcp list</code> (no hace falta <code>codex mcp login</code>: el servidor no pide credenciales) y pregunta desde <code>codex</code>.</p></li>
+        </ol>
+        <p class="nota-cliente">Verificado con Codex CLI 0.154: el comando registra el servidor como <code>streamable_http</code>.</p>
+      </div>
+
+      <div class="pestana oculto" data-pestana="claude-desktop" role="tabpanel">
+        <p class="nota-cliente">Claude Desktop habla con servidores locales por <em>stdio</em>. El puente
+          <a href="https://www.npmjs.com/package/mcp-remote" rel="noopener">mcp-remote</a> (necesita Node.js ≥ 20)
+          convierte este servidor remoto en uno local.</p>
+        <ol>
+          <li><p>Abre <em>Settings → Developer → Edit Config</em> y añade el servidor a <code>claude_desktop_config.json</code>:</p>
+            <div class="codigo"><pre>{
+  "mcpServers": {
+    "datosabiertos": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://datosabiertos.sejas.es/mcp", "--transport", "http-only"]
+    }
+  }
+}</pre></div></li>
+          <li><p>Reinicia Claude Desktop. Las herramientas aparecen en el menú de conectores de la conversación.</p></li>
+          <li><p>Si prefieres no depender de Node, clona el repositorio y usa el transporte <em>stdio</em> nativo (Python 3.11, sin <code>pip install</code>):</p>
+            <div class="codigo"><pre>{
+  "mcpServers": {
+    "datosabiertos": {
+      "command": "python3",
+      "args": ["-m", "tfm.mcp"],
+      "cwd": "/ruta/a/datosabiertos"
+    }
+  }
+}</pre></div></li>
+        </ol>
+      </div>
+
+      <div class="pestana oculto" data-pestana="editores" role="tabpanel">
+        <ol>
+          <li><p><strong>Cursor</strong> — <code>.cursor/mcp.json</code> en el proyecto (o <code>~/.cursor/mcp.json</code> para todos):</p>
+            <div class="codigo"><pre>{
+  "mcpServers": {
+    "datosabiertos": { "url": "https://datosabiertos.sejas.es/mcp" }
+  }
+}</pre></div></li>
+          <li><p><strong>VS Code (Copilot)</strong> — <code>.vscode/mcp.json</code>:</p>
+            <div class="codigo"><pre>{
+  "servers": {
+    "datosabiertos": { "type": "http", "url": "https://datosabiertos.sejas.es/mcp" }
+  }
+}</pre></div></li>
+          <li><p><strong>Gemini CLI</strong>:</p>
+            <div class="codigo"><pre>gemini mcp add --transport http datosabiertos https://datosabiertos.sejas.es/mcp</pre></div></li>
+        </ol>
+        <p class="nota-cliente">Cualquier cliente que admita el transporte <em>Streamable HTTP</em> sin autenticación vale. Si el tuyo solo habla <em>stdio</em>, usa el puente <code>mcp-remote</code> de la pestaña de Claude Desktop.</p>
+      </div>
+
+      <div class="pestana oculto" data-pestana="curl" role="tabpanel">
+        <ol>
+          <li><p>Lista las herramientas:</p>
+            <div class="codigo"><pre>curl -s https://datosabiertos.sejas.es/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</pre></div></li>
+          <li><p>Llama a una:</p>
+            <div class="codigo"><pre>curl -s https://datosabiertos.sejas.es/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"buscar_datasets","arguments":{"consulta":"calidad del aire","ciudad":"malaga","limite":3}}}'</pre></div></li>
+          <li><p>Estado del índice:</p>
+            <div class="codigo"><pre>curl -s https://datosabiertos.sejas.es/salud</pre></div></li>
+        </ol>
+      </div>
+
+      <div class="prompt-sugerido">
+        <h3>Un primer prompt para probarlo</h3>
+        <p class="nota-cliente">Pide explícitamente la cita y la licencia: es lo que distingue una respuesta comprobable de una inventada.</p>
+        <div class="codigo"><pre>Usa las herramientas de datosabiertos para responder: ¿qué datos abiertos publica Málaga sobre calidad del aire? Para cada dataset dame el título, la url_origen tal cual la devuelve la herramienta, la fecha de modificación y si el portal declara licencia. Si no hay resultados, dilo sin inventar nada. Después compara con Madrid usando comparar_ciudades.</pre></div>
+      </div>
+
+      <div class="contrato">
+        <div><strong>Herramientas</strong><code>buscar_datasets</code> · <code>detalle_dataset</code> · <code>listar_distribuciones</code> · <code>comparar_ciudades</code></div>
+        <div><strong>Procedencia</strong>Cada ficha lleva <code>url_origen</code>, <code>fecha_sincronizacion</code> y <code>licencia_declarada</code>.</div>
+        <div><strong>Ausencias</strong>Sin resultados no es una lista vacía: es un campo <code>sin_resultados</code> que pide no inventar.</div>
+        <div><strong>Límites</strong>Sin SSE ni sesiones; sin cuota más allá del sentido común. Es un prototipo de TFM.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Procedencia.</strong> Los metadatos son una copia de los portales municipales, no la fuente
+       viva: cada resultado lleva su <code>url_origen</code> y la fecha de sincronización. Los datasets cuyo
+       portal no declara licencia salen marcados como <span class="insignia">licencia no declarada</span>;
+       no se asume que sean abiertos.</p>
+    <p><strong>Privacidad.</strong> El motor «Servidor» envía tu conversación a OpenRouter y al proveedor del
+       modelo (Meta, nivel <em>contributor</em>, cuyas condiciones permiten usar las peticiones para
+       entrenamiento). El motor «Tu navegador» no envía nada a ningún sitio. La búsqueda directa tampoco.
+       No hay cuentas ni cookies.</p>
+    <p>Trabajo de Fin de Máster (MUIA, UPM), dirigido por Óscar Corcho. Código MIT en
+       <a href="https://github.com/sejas/datosabiertos" rel="noopener">github.com/sejas/datosabiertos</a>.
+       Metadatos: cada ayuntamiento conserva su licencia de origen.</p>
+  </footer>
 </main>
 
 <script src="vendor/sql-wasm.js"></script>

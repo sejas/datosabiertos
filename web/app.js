@@ -1,32 +1,102 @@
 /**
- * Cliente en el navegador: índice SQLite + agente con modelo pequeño por WebGPU.
+ * Cliente del navegador: chat con dos motores, búsqueda directa y guía de conexión MCP.
  *
- * Dos modos, y el orden importa:
+ * Los tres bloques de la página, y el orden importa:
  *
- * 1. **Modo directo**: llama a las herramientas sin ningún modelo. Funciona en cualquier
- *    navegador, sin WebGPU y sin descargar pesos. Es la garantía de que la página sirve
- *    para algo aunque el experimento B falle, y además es el patrón de referencia contra el
- *    que comparar al agente: si el modo directo encuentra el dataset y el agente no, el
- *    fallo es del modelo, no del índice.
- * 2. **Modo agente**: modelo pequeño cuantizado vía WebLLM. Coste de inferencia: 0 €, porque
- *    corre en la máquina del usuario.
+ * 1. **Chat**. Dos motores intercambiables detrás de la misma interfaz:
+ *    - *Servidor*: `POST /chat`. El modelo grande vive en OpenRouter y el bucle de agente
+ *      corre en el servidor (`tfm/mcp/chat.py`), que nos manda un evento por paso. Es el
+ *      experimento A del plan.
+ *    - *Navegador*: WebLLM por WebGPU. El bucle corre aquí, contra el índice SQLite abierto
+ *      en memoria con sql.js, y no sale nada de la máquina. Es el experimento B.
+ *    Los dos producen los mismos eventos (`paso`, `delta`, `fin`, `error`), así que el chat
+ *    se pinta igual y la única variable es el modelo.
+ * 2. **Búsqueda directa**: las herramientas sin ningún modelo. Funciona siempre y es el
+ *    patrón contra el que comparar: si esto encuentra el dataset y el agente no, el fallo es
+ *    del modelo, no del índice.
+ * 3. **Conectar**: instrucciones estáticas; aquí solo van las pestañas y los botones de copiar.
  *
- * La traza de llamadas se muestra siempre. Es una de las métricas del §6 del plan, y verla
- * es la única forma de distinguir "el modelo eligió mal la herramienta" de "la herramienta
- * no encontró nada".
+ * La traza de llamadas se muestra siempre: es una métrica del TFM, no depuración.
  */
 
 import { CATALOGO, ciudades, invocar } from './herramientas.js';
 
 const $ = (id) => document.getElementById(id);
 const RUTA_INDICE = 'datos/indice.sqlite.gz';
-const MAX_PASOS = 4;
+const MAX_PASOS_NAVEGADOR = 4;
 
-let bd = null;
-let motor = null;
+let bd = null;          // índice SQLite en memoria (sql.js)
+let motorLocal = null;  // motor WebLLM, si se ha cargado
+let salud = null;       // respuesta de GET /salud
+let historial = [];     // [{role, content}] que se manda al modelo
+let ocupado = false;
 
 // --------------------------------------------------------------------------------------
-// Índice
+// Utilidades
+// --------------------------------------------------------------------------------------
+
+const escapar = (t) => String(t ?? '').replace(/[&<>"]/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/** Markdown mínimo y seguro: se escapa todo y luego se reconocen unas pocas marcas. */
+function renderizarMarkdown(texto) {
+  const enLinea = (s) => escapar(s)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/(^|[^"'>])(https?:\/\/[^\s<]+[^\s<.,;:)])/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+
+  const bloques = [];
+  let lista = null;
+  const cerrarLista = () => { if (lista) { bloques.push(`<${lista.tipo}>${lista.items.join('')}</${lista.tipo}>`); lista = null; } };
+  for (const parrafo of texto.split(/\n{2,}/)) {
+    const lineas = parrafo.split('\n');
+    const salida = [];
+    for (const linea of lineas) {
+      const item = linea.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
+      if (item) {
+        const tipo = /^\s*\d/.test(linea) ? 'ol' : 'ul';
+        if (!lista || lista.tipo !== tipo) { cerrarLista(); lista = { tipo, items: [] }; }
+        lista.items.push(`<li>${enLinea(item[1])}</li>`);
+      } else {
+        cerrarLista();
+        if (linea.trim()) salida.push(enLinea(linea));
+      }
+    }
+    cerrarLista();
+    if (salida.length) bloques.push(`<p>${salida.join('<br>')}</p>`);
+  }
+  cerrarLista();
+  return bloques.join('');
+}
+
+function fichaHTML(f) {
+  const licencia = f.licencia_declarada
+    ? `<span class="insignia ok">licencia ${escapar(f.licencia)}</span>`
+    : '<span class="insignia">licencia NO declarada</span>';
+  return `<article class="tarjeta${f.licencia_declarada ? '' : ' sin-licencia'}">
+      <h3>${escapar(f.titulo)}</h3>
+      <p>${escapar((f.descripcion || '').slice(0, 240))}</p>
+      <div class="meta">
+        <span>${escapar(f.ciudad)}</span>
+        <span>${f.num_distribuciones} distribuciones</span>
+        ${licencia}
+        <span>modificado ${(f.fecha_modificacion_origen || 'sin fecha').slice(0, 10)}</span>
+        <a href="${encodeURI(f.url_origen)}" target="_blank" rel="noopener">ver en el portal ↗</a>
+      </div></article>`;
+}
+
+function pintarFichas(fichas, destino) {
+  destino.innerHTML = fichas.length
+    ? fichas.map(fichaHTML).join('')
+    : '<p class="aviso">Sin resultados en el índice. Si la ciudad es Barcelona o Reus, ' +
+      'prueba en catalán: sus catálogos están en catalán.</p>';
+}
+
+function formatearNumero(n) { return Number(n).toLocaleString('es-ES'); }
+
+// --------------------------------------------------------------------------------------
+// Índice y estado del servidor
 // --------------------------------------------------------------------------------------
 
 async function abrirIndice() {
@@ -50,8 +120,7 @@ async function abrirIndice() {
   let posicion = 0;
   for (const t of trozos) { comprimido.set(t, posicion); posicion += t.length; }
 
-  // El repositorio publica solo el índice comprimido (3,4 MB en vez de 21). Se descomprime
-  // aquí, en el cliente, con la API nativa del navegador: sin librería y sin servidor.
+  // Solo se publica el índice comprimido. Se descomprime aquí con la API nativa del navegador.
   if (typeof DecompressionStream !== 'function') {
     throw new Error('este navegador no soporta DecompressionStream; usa Chrome/Edge 80+, ' +
                     'Firefox 113+ o Safari 16.4+');
@@ -61,15 +130,8 @@ async function abrirIndice() {
 
   bd = new SQL.Database(bytes);
   $('barra').classList.add('oculto');
-
-  const [{ values }] = bd.exec(
-    `SELECT (SELECT COUNT(*) FROM dataset), (SELECT COUNT(*) FROM distribucion),
-            (SELECT COUNT(*) FROM portal),
-            (SELECT valor FROM metadatos_indice WHERE clave='ultima_sincronizacion')`);
-  const [nd, ndist, np, sinc] = values[0];
-  $('resumen-indice').textContent =
-    `${nd} datasets · ${ndist} distribuciones · ${np} ciudades · sincronizado ${(sinc || '?').slice(0, 10)}`;
-  $('estado').textContent = `Índice listo (${(recibido / 1e6).toFixed(1)} MB en memoria). Todo ocurre en tu navegador.`;
+  $('estado').textContent = `Índice listo (${(bytes.length / 1e6).toFixed(0)} MB en memoria). ` +
+    'La búsqueda directa ocurre en tu navegador.';
 
   const selector = $('ciudad');
   for (const c of ciudades(bd)) {
@@ -80,69 +142,172 @@ async function abrirIndice() {
   }
 }
 
-// --------------------------------------------------------------------------------------
-// Presentación
-// --------------------------------------------------------------------------------------
-
-function pintarFichas(fichas, destino) {
-  destino.innerHTML = '';
-  if (!fichas.length) {
-    destino.innerHTML = '<p class="aviso">Sin resultados en el índice. ' +
-      'Si la ciudad es Barcelona o Reus, prueba en catalán: sus catálogos están en catalán.</p>';
-    return;
+async function consultarSalud() {
+  try {
+    const r = await fetch('salud', { cache: 'no-store' });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    salud = await r.json();
+  } catch {
+    salud = null;
   }
-  for (const f of fichas) {
-    const tarjeta = document.createElement('article');
-    tarjeta.className = 'tarjeta' + (f.licencia_declarada ? '' : ' sin-licencia');
-    const licencia = f.licencia_declarada
-      ? `licencia ${f.licencia}`
-      : '<span class="insignia">licencia NO declarada</span>';
-    tarjeta.innerHTML = `
-      <h3>${escapar(f.titulo)}</h3>
-      <p>${escapar((f.descripcion || '').slice(0, 240))}</p>
-      <div class="meta">
-        <span>${escapar(f.ciudad)}</span>
-        <span>${f.num_distribuciones} distribuciones</span>
-        <span>${licencia}</span>
-        <span>modificado ${(f.fecha_modificacion_origen || 'sin fecha').slice(0, 10)}</span>
-        <a href="${encodeURI(f.url_origen)}" target="_blank" rel="noopener">ver en el portal ↗</a>
-      </div>`;
-    destino.append(tarjeta);
+  const cifras = $('cifras');
+  if (salud) {
+    cifras.innerHTML = [
+      `<strong>${formatearNumero(salud.datasets)}</strong> datasets`,
+      `<strong>${formatearNumero(salud.distribuciones)}</strong> distribuciones`,
+      `<strong>${salud.ciudades.length}</strong> ciudades`,
+      `<strong>${formatearNumero(salud.sin_licencia_declarada)}</strong> sin licencia declarada`,
+      `sincronizado <strong>${(salud.ultima_sincronizacion || '?').slice(0, 10)}</strong>`,
+    ].map((t) => `<span>${t}</span>`).join('');
+  } else {
+    cifras.innerHTML = '<span>servidor no disponible: solo búsqueda directa y modelo en el navegador</span>';
   }
-}
-
-const escapar = (t) => String(t ?? '').replace(/[&<>"]/g, (c) =>
-  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-
-function anotarTraza(texto) {
-  const linea = document.createElement('div');
-  linea.className = 'traza';
-  linea.textContent = texto;
-  $('traza').append(linea);
+  configurarMotores();
 }
 
 // --------------------------------------------------------------------------------------
-// Modo directo
+// Chat: presentación
 // --------------------------------------------------------------------------------------
 
-function buscarDirecto() {
-  if (!bd) return;
-  const r = invocar(bd, 'buscar_datasets', {
-    consulta: $('q').value.trim(),
-    ciudad: $('ciudad').value || null,
-    limite: 10,
+const EJEMPLOS_CHAT = [
+  '¿Qué datos hay sobre calidad del aire en Málaga?',
+  '¿Publica Córdoba algo sobre presupuestos y con qué licencia?',
+  '¿Qué ciudades publican datos de arbolado y cuáles no?',
+  'Quins conjunts de dades té Barcelona sobre contaminació?',
+  '¿En qué formatos se puede descargar el padrón de Madrid?',
+];
+
+function desplazarAlFinal() {
+  const m = $('mensajes');
+  m.scrollTop = m.scrollHeight;
+}
+
+function anadirMensajeUsuario(texto) {
+  $('bienvenida')?.remove();
+  const div = document.createElement('div');
+  div.className = 'mensaje usuario';
+  div.innerHTML = `<div class="burbuja"></div>`;
+  div.firstElementChild.textContent = texto;
+  $('mensajes').append(div);
+  desplazarAlFinal();
+}
+
+/** Crea el contenedor de una respuesta y devuelve funciones para irla rellenando. */
+function nuevaRespuesta() {
+  const div = document.createElement('div');
+  div.className = 'mensaje asistente';
+  const pensando = document.createElement('span');
+  pensando.className = 'pensando';
+  pensando.textContent = 'pensando';
+  div.append(pensando);
+  $('mensajes').append(div);
+  desplazarAlFinal();
+
+  let texto = null;
+  let acumulado = '';
+  return {
+    paso(e) {
+      const detalles = document.createElement('details');
+      detalles.className = 'paso';
+      const r = e.resultado || {};
+      const esError = Boolean(r.error);
+      const conDatos = r.con_datos ? Object.values(r.con_datos) : null;
+      const cuenta = esError ? 'error'
+        : r.n_resultados !== undefined ? `${r.n_resultados} resultado${r.n_resultados === 1 ? '' : 's'}`
+        : r.sin_resultados ? '0 resultados'
+        : conDatos ? `${conDatos.length} con datos · ${(r.sin_datos || []).length} sin datos`
+        : r.distribuciones ? `${r.distribuciones.length} distribuciones`
+        : r.titulo ? 'ficha' : 'ok';
+      const argumentos = Object.entries(e.argumentos || {})
+        .map(([k, v]) => `${k}=${JSON.stringify(v)}`).join(' ');
+      detalles.innerHTML = `
+        <summary>
+          <span class="nombre">${escapar(e.herramienta)}</span>
+          <span class="args">${escapar(argumentos)}</span>
+          <span class="cuenta${esError ? ' error' : ''}">${escapar(cuenta)}${e.ms ? ` · ${(e.ms / 1000).toFixed(1)} s` : ''}</span>
+        </summary>
+        <div class="cuerpo"></div>`;
+      const cuerpo = detalles.querySelector('.cuerpo');
+      const fichas = r.resultados
+        || (conDatos ? conDatos.flatMap((c) => c.datasets || []) : null)
+        || (r.titulo && r.url_origen ? [r] : null);
+      if (fichas?.length) {
+        const nota = r.nota_sin_datos ? `<p class="aviso alerta">${escapar(r.nota_sin_datos)}</p>` : '';
+        cuerpo.innerHTML = `${nota}<div class="fichas">${fichas.map(fichaHTML).join('')}</div>`;
+        detalles.open = fichas.length <= 3; // las comparaciones largas, plegadas: el resumen ya dice cuántas
+      } else {
+        const pre = document.createElement('pre');
+        pre.textContent = JSON.stringify(r, null, 1).slice(0, 4000);
+        cuerpo.append(pre);
+      }
+      div.insertBefore(detalles, pensando);
+      desplazarAlFinal();
+    },
+    delta(t) {
+      if (!texto) {
+        texto = document.createElement('div');
+        texto.className = 'texto';
+        div.insertBefore(texto, pensando);
+      }
+      acumulado += t;
+      texto.innerHTML = renderizarMarkdown(acumulado);
+      desplazarAlFinal();
+    },
+    error(mensaje) {
+      const e = document.createElement('div');
+      e.className = 'error-chat';
+      e.textContent = mensaje;
+      div.insertBefore(e, pensando);
+      desplazarAlFinal();
+    },
+    fin() {
+      pensando.remove();
+      desplazarAlFinal();
+      return acumulado;
+    },
+  };
+}
+
+// --------------------------------------------------------------------------------------
+// Motor servidor: POST /chat con eventos SSE
+// --------------------------------------------------------------------------------------
+
+async function conversarServidor(mensajes, salida) {
+  const r = await fetch('chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: mensajes }),
   });
-  pintarFichas(r.resultados || [], $('resultados'));
-  $('estado').textContent = r.sin_resultados
-    ? 'El índice no contiene nada que encaje.'
-    : `${r.n_resultados} resultados.`;
+  if (!r.ok) {
+    let detalle = `HTTP ${r.status}`;
+    try { detalle = (await r.json()).error || detalle; } catch { /* sin cuerpo JSON */ }
+    throw new Error(detalle);
+  }
+  // Se parsea el flujo SSE a mano: EventSource no admite POST.
+  const lector = r.body.pipeThrough(new TextDecoderStream()).getReader();
+  let resto = '';
+  for (;;) {
+    const { done, value } = await lector.read();
+    if (done) break;
+    resto += value;
+    const partes = resto.split('\n\n');
+    resto = partes.pop();
+    for (const parte of partes) {
+      const linea = parte.split('\n').find((l) => l.startsWith('data:'));
+      if (!linea) continue;
+      const evento = JSON.parse(linea.slice(5));
+      if (evento.tipo === 'paso') salida.paso(evento);
+      else if (evento.tipo === 'delta') salida.delta(evento.texto);
+      else if (evento.tipo === 'error') salida.error(evento.mensaje);
+    }
+  }
 }
 
 // --------------------------------------------------------------------------------------
-// Modo agente
+// Motor navegador: WebLLM con protocolo JSON (los modelos pequeños no traen tool-calling fiable)
 // --------------------------------------------------------------------------------------
 
-const SISTEMA = `Eres un asistente que consulta un índice de catálogos de datos abiertos de ayuntamientos españoles.
+const SISTEMA_LOCAL = `Eres un asistente que consulta un índice de catálogos de datos abiertos de ayuntamientos españoles.
 
 Herramientas disponibles:
 ${Object.entries(CATALOGO).map(([n, e]) => `- ${n}: ${e.descripcion}`).join('\n')}
@@ -178,82 +343,61 @@ function extraerJSON(texto) {
   return null;
 }
 
-async function preguntar() {
-  const pregunta = $('pregunta').value.trim();
-  if (!pregunta || !motor) return;
-  $('traza').innerHTML = '';
-  $('respuesta').innerHTML = '';
-  $('btn-preguntar').disabled = true;
-
+async function conversarNavegador(mensajesUsuario, salida) {
+  if (!motorLocal) throw new Error('carga primero un modelo en tu navegador');
   const listaCiudades = ciudades(bd).map((c) => `${c.id} (${c.municipio})`).join(', ');
   const mensajes = [
-    { role: 'system', content: SISTEMA.replace('CIUDADES', listaCiudades) },
-    { role: 'user', content: pregunta },
+    { role: 'system', content: SISTEMA_LOCAL.replace('CIUDADES', listaCiudades) },
+    ...mensajesUsuario,
   ];
+  for (let paso = 1; paso <= MAX_PASOS_NAVEGADOR; paso++) {
+    const t0 = performance.now();
+    const respuesta = await motorLocal.chat.completions.create({ messages: mensajes, temperature: 0, max_tokens: 400 });
+    const texto = respuesta.choices[0].message.content ?? '';
+    const ms = Math.round(performance.now() - t0);
 
-  try {
-    for (let paso = 1; paso <= MAX_PASOS; paso++) {
-      const t0 = performance.now();
-      const salida = await motor.chat.completions.create({ messages: mensajes, temperature: 0, max_tokens: 400 });
-      const texto = salida.choices[0].message.content ?? '';
-      const ms = Math.round(performance.now() - t0);
-
-      const orden = extraerJSON(texto);
-      if (!orden) {
-        anotarTraza(`paso ${paso} · ${ms} ms · el modelo no devolvió JSON válido:\n${texto.slice(0, 300)}`);
-        $('respuesta').innerHTML = '<div class="respuesta">El modelo no ha conseguido emitir una ' +
-          'llamada de herramienta válida. Es el fallo típico de los modelos pequeños con ' +
-          'tool-calling, y forma parte de lo que el TFM mide. Usa el modo directo de arriba.</div>';
-        break;
-      }
-      if (orden.respuesta) {
-        anotarTraza(`paso ${paso} · ${ms} ms · respuesta final`);
-        $('respuesta').innerHTML = `<div class="respuesta">${escapar(orden.respuesta)}</div>`;
-        break;
-      }
-      if (!orden.herramienta) {
-        anotarTraza(`paso ${paso} · ${ms} ms · JSON sin campo "herramienta": ${JSON.stringify(orden).slice(0, 200)}`);
-        break;
-      }
-
-      const resultado = invocar(bd, orden.herramienta, orden.argumentos || {});
-      anotarTraza(`paso ${paso} · ${ms} ms · ${orden.herramienta}(${JSON.stringify(orden.argumentos || {})})` +
-        ` → ${resultado.n_resultados ?? (resultado.error ? 'error' : 'ok')}`);
-      if (resultado.resultados) pintarFichas(resultado.resultados, $('respuesta'));
-
-      mensajes.push({ role: 'assistant', content: texto });
-      mensajes.push({
-        role: 'user',
-        content: `Resultado de ${orden.herramienta}:\n${JSON.stringify(resultado).slice(0, 3000)}\n\n` +
-          'Si ya puedes responder, devuelve {"respuesta": "..."}.',
-      });
-
-      if (paso === MAX_PASOS) {
-        anotarTraza(`se alcanzó el máximo de ${MAX_PASOS} pasos sin respuesta final`);
-      }
+    const orden = extraerJSON(texto);
+    if (!orden) {
+      salida.error('El modelo no ha devuelto una llamada de herramienta válida. Es el fallo ' +
+        'típico de los modelos pequeños con tool-calling, y forma parte de lo que el TFM mide. ' +
+        `Texto recibido: ${texto.slice(0, 200)}`);
+      return;
     }
-  } catch (e) {
-    anotarTraza(`error: ${e.message}`);
-  } finally {
-    $('btn-preguntar').disabled = false;
+    if (orden.respuesta) { salida.delta(String(orden.respuesta)); return; }
+    if (!orden.herramienta) {
+      salida.error(`JSON sin campo "herramienta": ${JSON.stringify(orden).slice(0, 200)}`);
+      return;
+    }
+    const resultado = invocar(bd, orden.herramienta, orden.argumentos || {});
+    salida.paso({ herramienta: orden.herramienta, argumentos: orden.argumentos || {}, resultado, ms });
+    mensajes.push({ role: 'assistant', content: texto });
+    mensajes.push({
+      role: 'user',
+      content: `Resultado de ${orden.herramienta}:\n${JSON.stringify(resultado).slice(0, 3000)}\n\n` +
+        'Si ya puedes responder, devuelve {"respuesta": "..."}.',
+    });
   }
+  salida.error(`se alcanzó el máximo de ${MAX_PASOS_NAVEGADOR} pasos sin respuesta final`);
 }
 
-async function prepararModelo() {
+async function prepararWebLLM() {
+  const texto = $('texto-navegador');
   if (!navigator.gpu) {
-    $('aviso-webgpu').innerHTML = '<strong>Tu navegador no expone WebGPU</strong>, así que el modo ' +
-      'agente no puede funcionar aquí. El modo directo de arriba sí. Prueba con Chrome o Edge ' +
-      'recientes, o Safari 18+. Esta limitación es justo uno de los riesgos que el TFM mide.';
+    texto.innerHTML = '<strong>Tu navegador no expone WebGPU</strong>, así que este motor no ' +
+      'puede funcionar aquí. Prueba con Chrome o Edge recientes, o Safari 18+. El motor ' +
+      '«Servidor» y la búsqueda directa sí funcionan.';
+    $('controles-modelo').classList.add('oculto');
     return;
   }
-  $('aviso-webgpu').textContent = 'WebGPU disponible. Elige un modelo: se descarga una vez ' +
-    '(cientos de MB) y queda en la caché del navegador. La inferencia es gratis y local.';
+  texto.textContent = 'WebGPU disponible. Elige un modelo: se descarga una vez (cientos de MB) ' +
+    'y queda en la caché del navegador. La inferencia es local y no sale nada de tu máquina.';
 
   let webllm;
   try {
     webllm = await import('https://esm.run/@mlc-ai/web-llm');
   } catch {
-    $('aviso-webgpu').textContent = 'No se pudo cargar WebLLM desde la red. El modo directo sigue funcionando.';
+    texto.textContent = 'No se pudo cargar WebLLM desde la red. El motor «Servidor» sigue funcionando.';
+    $('controles-modelo').classList.add('oculto');
     return;
   }
 
@@ -279,7 +423,7 @@ async function prepararModelo() {
     $('btn-cargar').disabled = true;
     $('barra-modelo').classList.remove('oculto');
     try {
-      motor = await webllm.CreateMLCEngine(selector.value, {
+      motorLocal = await webllm.CreateMLCEngine(selector.value, {
         initProgressCallback: (p) => {
           $('estado-modelo').textContent = p.text;
           if (typeof p.progress === 'number') $('barra-modelo').value = Math.round(p.progress * 100);
@@ -287,8 +431,7 @@ async function prepararModelo() {
       });
       $('estado-modelo').textContent = `Modelo ${selector.value} cargado. Inferencia local, 0 €.`;
       $('barra-modelo').classList.add('oculto');
-      $('pregunta').disabled = false;
-      $('btn-preguntar').disabled = false;
+      actualizarCompositor();
     } catch (e) {
       $('estado-modelo').textContent = `No se pudo cargar el modelo: ${e.message}`;
       $('btn-cargar').disabled = false;
@@ -297,44 +440,223 @@ async function prepararModelo() {
 }
 
 // --------------------------------------------------------------------------------------
-// Arranque
+// Chat: control
+// --------------------------------------------------------------------------------------
+
+function motorActual() { return $('motor').value; }
+
+function motorDisponible() {
+  return motorActual() === 'servidor' ? Boolean(salud?.chat?.disponible) : Boolean(motorLocal);
+}
+
+function actualizarCompositor() {
+  const listo = motorDisponible() && !ocupado;
+  $('btn-enviar').disabled = !listo;
+  $('pregunta').disabled = ocupado;
+  $('pregunta').placeholder = motorActual() === 'servidor'
+    ? (salud?.chat?.disponible ? '¿Qué datos hay sobre calidad del aire en Málaga?'
+                               : 'El chat alojado no está disponible; usa tu navegador o la búsqueda directa')
+    : (motorLocal ? '¿Qué datos hay sobre calidad del aire en Málaga?' : 'Carga primero un modelo');
+}
+
+function configurarMotores() {
+  const chat = salud?.chat;
+  const selector = $('motor');
+  const opcionServidor = selector.querySelector('option[value=servidor]');
+  if (chat?.disponible) {
+    opcionServidor.textContent = `Servidor · ${chat.modelo}`;
+    $('texto-servidor').innerHTML = `El bucle de agente corre en el servidor con <code>${escapar(chat.modelo)}</code> ` +
+      'vía OpenRouter, con tool-calling nativo. Tu conversación sale de tu navegador hacia ese proveedor. ' +
+      `Límite: ${chat.limite_por_ip} preguntas cada ${Math.round(chat.ventana_segundos / 60)} minutos por dirección; ` +
+      'si lo agotas, conecta el MCP a tu propio agente (más abajo).';
+  } else {
+    opcionServidor.textContent = 'Servidor · no disponible';
+    opcionServidor.disabled = true;
+    selector.value = 'navegador';
+    $('texto-servidor').textContent = 'El chat alojado no está configurado en este servidor.';
+  }
+  $('pie-chat').textContent = 'El modelo solo ve lo que devuelven las herramientas. Si dice que algo ' +
+    'no está en el índice, compruébalo con la búsqueda directa: si ahí tampoco sale, es el índice; si sale, es el modelo.';
+  cambiarMotor();
+}
+
+function cambiarMotor() {
+  const servidor = motorActual() === 'servidor';
+  $('motor-servidor').classList.toggle('oculto', !servidor);
+  $('motor-navegador').classList.toggle('oculto', servidor);
+  if (!servidor && !prepararWebLLM.iniciado) {
+    prepararWebLLM.iniciado = true;
+    prepararWebLLM();
+  }
+  actualizarCompositor();
+}
+
+async function enviar(texto) {
+  texto = (texto ?? $('pregunta').value).trim();
+  if (!texto || ocupado || !motorDisponible()) return;
+  ocupado = true;
+  actualizarCompositor();
+  $('pregunta').value = '';
+  ajustarAltura();
+  anadirMensajeUsuario(texto);
+  historial.push({ role: 'user', content: texto });
+
+  const salida = nuevaRespuesta();
+  try {
+    if (motorActual() === 'servidor') await conversarServidor(historial, salida);
+    else await conversarNavegador(historial, salida);
+  } catch (e) {
+    salida.error(e.message);
+  } finally {
+    const respuesta = salida.fin();
+    if (respuesta) historial.push({ role: 'assistant', content: respuesta });
+    else historial.pop(); // sin respuesta no hay turno que recordar
+    ocupado = false;
+    actualizarCompositor();
+    $('pregunta').focus();
+  }
+}
+
+function nuevaConversacion() {
+  if (ocupado) return;
+  historial = [];
+  $('mensajes').innerHTML = '';
+  const bienvenida = document.createElement('div');
+  bienvenida.className = 'bienvenida';
+  bienvenida.id = 'bienvenida';
+  bienvenida.innerHTML = '<p>Conversación nueva. Prueba con una de estas:</p><div class="chips" id="ejemplos-chat"></div>';
+  $('mensajes').append(bienvenida);
+  pintarEjemplosChat();
+  $('pregunta').focus();
+}
+
+function ajustarAltura() {
+  const t = $('pregunta');
+  t.style.height = 'auto';
+  t.style.height = `${Math.min(t.scrollHeight, 160)}px`;
+}
+
+function pintarEjemplosChat() {
+  const destino = $('ejemplos-chat');
+  if (!destino) return;
+  destino.innerHTML = '';
+  for (const texto of EJEMPLOS_CHAT) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = texto;
+    b.onclick = () => {
+      if (motorDisponible()) enviar(texto);
+      else { $('pregunta').value = texto; ajustarAltura(); $('pregunta').focus(); }
+    };
+    destino.append(b);
+  }
+}
+
+// --------------------------------------------------------------------------------------
+// Búsqueda directa
 // --------------------------------------------------------------------------------------
 
 const EJEMPLOS_DIRECTO = ['calidad del aire', 'bicimad', 'presupuesto', 'arbolado', 'contaminació'];
-const EJEMPLOS_AGENTE = [
-  '¿Qué datos hay sobre calidad del aire en Málaga?',
-  '¿Publica Córdoba algo sobre presupuestos y con qué licencia?',
-  '¿Qué ciudades publican datos de arbolado?',
-  '¿Tiene Reus un inventario de arbolado urbano?',
-];
 
-function pintarEjemplos() {
-  for (const [destino, ejemplos, campo, accion] of [
-    ['ejemplos-directo', EJEMPLOS_DIRECTO, 'q', buscarDirecto],
-    ['ejemplos-agente', EJEMPLOS_AGENTE, 'pregunta', preguntar],
-  ]) {
-    for (const texto of ejemplos) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = texto;
-      b.onclick = () => { $(campo).value = texto; if (!$(campo).disabled) accion(); };
-      $(destino).append(b);
+function buscarDirecto() {
+  if (!bd) return;
+  const r = invocar(bd, 'buscar_datasets', {
+    consulta: $('q').value.trim(),
+    ciudad: $('ciudad').value || null,
+    limite: 10,
+  });
+  pintarFichas(r.resultados || [], $('resultados'));
+  $('estado').textContent = r.sin_resultados
+    ? 'El índice no contiene nada que encaje.'
+    : `${r.n_resultados} resultados.`;
+}
+
+function pintarEjemplosDirecto() {
+  for (const texto of EJEMPLOS_DIRECTO) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = texto;
+    b.onclick = () => { $('q').value = texto; buscarDirecto(); };
+    $('ejemplos-directo').append(b);
+  }
+}
+
+// --------------------------------------------------------------------------------------
+// Conectar: pestañas y botones de copiar
+// --------------------------------------------------------------------------------------
+
+function prepararConectar() {
+  const pestanas = $('pestanas');
+  pestanas.addEventListener('click', (e) => {
+    const boton = e.target.closest('[role=tab]');
+    if (!boton) return;
+    for (const b of pestanas.querySelectorAll('[role=tab]')) b.setAttribute('aria-selected', String(b === boton));
+    for (const p of document.querySelectorAll('.pestana')) {
+      p.classList.toggle('oculto', p.dataset.pestana !== boton.dataset.pestana);
+    }
+  });
+
+  for (const bloque of document.querySelectorAll('.codigo')) {
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'copiar';
+    boton.textContent = 'Copiar';
+    boton.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(bloque.querySelector('pre').textContent);
+        boton.textContent = 'Copiado';
+      } catch {
+        boton.textContent = 'No se pudo';
+      }
+      setTimeout(() => { boton.textContent = 'Copiar'; }, 1500);
+    };
+    bloque.append(boton);
+  }
+
+  // La URL del endpoint se toma de la página real, por si se sirve desde otro dominio.
+  const url = new URL('mcp', location.href).href;
+  if (url !== $('url-mcp').textContent) {
+    for (const el of document.querySelectorAll('#conectar pre, #url-mcp')) {
+      el.textContent = el.textContent.replaceAll('https://datosabiertos.sejas.es/mcp', url)
+        .replaceAll('https://datosabiertos.sejas.es/salud', new URL('salud', location.href).href);
     }
   }
 }
 
+// --------------------------------------------------------------------------------------
+// Arranque
+// --------------------------------------------------------------------------------------
+
 (async () => {
-  pintarEjemplos();
+  pintarEjemplosChat();
+  pintarEjemplosDirecto();
+  prepararConectar();
+
+  $('compositor').addEventListener('submit', (e) => { e.preventDefault(); enviar(); });
+  $('pregunta').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); }
+  });
+  $('pregunta').addEventListener('input', ajustarAltura);
+  $('btn-nueva').onclick = nuevaConversacion;
+  $('motor').onchange = cambiarMotor;
   $('btn-buscar').onclick = buscarDirecto;
   $('q').addEventListener('keydown', (e) => { if (e.key === 'Enter') buscarDirecto(); });
-  $('pregunta').addEventListener('keydown', (e) => { if (e.key === 'Enter') preguntar(); });
-  $('btn-preguntar').onclick = preguntar;
+
+  actualizarCompositor();
+  // En paralelo con el índice: el chat del servidor no necesita esperarlo. Con `?q=` en la
+  // URL se manda esa pregunta en cuanto haya motor: sirve para compartir un enlace.
+  consultarSalud().then(() => {
+    const q = new URLSearchParams(location.search).get('q');
+    if (q && motorDisponible()) enviar(q);
+    else if (q) { $('pregunta').value = q; ajustarAltura(); }
+  });
+
   try {
     await abrirIndice();
     $('q').value = 'calidad del aire';
     buscarDirecto();
   } catch (e) {
     $('estado').textContent = `No se pudo abrir el índice: ${e.message}`;
+    $('estado').classList.add('alerta');
   }
-  prepararModelo();
 })();
