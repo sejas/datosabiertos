@@ -14,17 +14,17 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from tfm.almacen import Almacen  # noqa: E402
-from tfm.conectores.ckan import ConectorCKAN  # noqa: E402
-from tfm.configuracion import Portal  # noqa: E402
-from tfm.esquema import construir_consulta_fts  # noqa: E402
-from tfm.modelo import (  # noqa: E402
+from datosabiertos.almacen import Almacen  # noqa: E402
+from datosabiertos.conectores.ckan import ConectorCKAN  # noqa: E402
+from datosabiertos.configuracion import Portal  # noqa: E402
+from datosabiertos.esquema import construir_consulta_fts  # noqa: E402
+from datosabiertos.modelo import (  # noqa: E402
     LICENCIA_NO_DECLARADA,
     entero_o_none,
     normalizar_fecha,
     normalizar_licencia,
 )
-from tfm.registro import ahora_utc  # noqa: E402
+from datosabiertos.registro import ahora_utc  # noqa: E402
 
 PORTAL = Portal(
     id="prueba", municipio="Villaprueba", familia="ckan",

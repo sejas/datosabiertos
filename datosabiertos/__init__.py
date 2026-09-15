@@ -9,7 +9,7 @@ Módulos:
 - `esquema`: DDL de SQLite (incluida la tabla FTS5 en español).
 - `almacen`: capa de persistencia sobre SQLite.
 - `conectores`: `ConectorCatalogo` (interfaz) y `ConectorCKAN` (implementación).
-- `index`: interfaz de línea de órdenes (`python -m tfm.index build`).
+- `index`: interfaz de línea de órdenes (`python -m datosabiertos.index build`).
 
 Sin dependencias externas: solo biblioteca estándar de Python 3.
 """

@@ -66,7 +66,7 @@
         "metodo": "indice-local",
         "fecha": "2026-07-25",
         "comandos": [
-          "python3 -m tfm.index buscar 'calidad del aire tiempo real' --portal madrid --limite 5"
+          "python3 -m datosabiertos.index buscar 'calidad del aire tiempo real' --portal madrid --limite 5"
         ]
       }
     },
@@ -116,7 +116,7 @@
       "verificacion": {
         "metodo": "indice-local",
         "fecha": "2026-07-25",
-        "comandos": ["python3 -m tfm.index buscar 'presupuestos 2026' --portal malaga --limite 5"]
+        "comandos": ["python3 -m datosabiertos.index buscar 'presupuestos 2026' --portal malaga --limite 5"]
       }
     },
 
@@ -157,7 +157,7 @@
       "verificacion": {
         "metodo": "indice-local",
         "fecha": "2026-07-25",
-        "comandos": ["python3 -m tfm.index buscar 'farmacias' --portal reus --limite 5"]
+        "comandos": ["python3 -m datosabiertos.index buscar 'farmacias' --portal reus --limite 5"]
       }
     },
 
@@ -212,7 +212,7 @@
         "metodo": "indice-local",
         "fecha": "2026-07-25",
         "comandos": [
-          "python3 -m tfm.index buscar 'calidad del aire' --portal cordoba --limite 5",
+          "python3 -m datosabiertos.index buscar 'calidad del aire' --portal cordoba --limite 5",
           "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset d JOIN licencia l ON l.id=d.licencia_id WHERE d.portal_id='cordoba' AND l.declarada=0\""
         ]
       }
@@ -263,7 +263,7 @@
         "metodo": "indice-local",
         "fecha": "2026-07-25",
         "comandos": [
-          "python3 -m tfm.index buscar 'arbolado parques zonas verdes' --portal madrid --limite 5"
+          "python3 -m datosabiertos.index buscar 'arbolado parques zonas verdes' --portal madrid --limite 5"
         ]
       }
     },
@@ -339,8 +339,8 @@
         "metodo": "indice-local",
         "fecha": "2026-07-25",
         "comandos": [
-          "python3 -m tfm.index buscar 'arbolado viario' --portal barcelona --limite 5",
-          "python3 -m tfm.index buscar 'arbrat viari' --portal barcelona --limite 5"
+          "python3 -m datosabiertos.index buscar 'arbolado viario' --portal barcelona --limite 5",
+          "python3 -m datosabiertos.index buscar 'arbrat viari' --portal barcelona --limite 5"
         ]
       }
     },
@@ -477,7 +477,7 @@
         "comandos": [
           "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset WHERE portal_id='malaga' AND lower(titulo) LIKE '%mapa estrat%ruido%'\"",
           "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset WHERE portal_id='barcelona' AND nombre LIKE '%mapa-estrategic-soroll%'\"",
-          "python3 -m tfm.index buscar 'mapa estrategico de ruido' --portal barcelona --limite 5"
+          "python3 -m datosabiertos.index buscar 'mapa estrategico de ruido' --portal barcelona --limite 5"
         ]
       }
     },
@@ -563,7 +563,7 @@
         "metodo": "indice-local",
         "fecha": "2026-07-25",
         "comandos": [
-          "python3 -m tfm.index buscar 'presupuesto' --portal reus --limite 5",
+          "python3 -m datosabiertos.index buscar 'presupuesto' --portal reus --limite 5",
           "sqlite3 datos/indice.sqlite \"SELECT identificador_origen, titulo FROM dataset WHERE portal_id='reus' AND titulo LIKE 'Pressupost inicial de despesa%'\""
         ]
       }
@@ -628,7 +628,7 @@
         "metodo": "indice-local",
         "fecha": "2026-07-25",
         "comandos": [
-          "python3 -m tfm.index buscar 'calidad del aire' --portal malaga --limite 10",
+          "python3 -m datosabiertos.index buscar 'calidad del aire' --portal malaga --limite 10",
           "sqlite3 datos/indice.sqlite \"SELECT titulo, fecha_modificacion_origen FROM dataset WHERE portal_id='malaga' AND lower(titulo) LIKE '%calidad del aire%'\""
         ]
       }
@@ -922,8 +922,8 @@
         "metodo": "indice-local",
         "fecha": "2026-07-25",
         "comandos": [
-          "python3 -m tfm.index buscar 'arbolado' --portal reus --limite 5",
-          "python3 -m tfm.index buscar 'arbrat' --portal reus --limite 5",
+          "python3 -m datosabiertos.index buscar 'arbolado' --portal reus --limite 5",
+          "python3 -m datosabiertos.index buscar 'arbrat' --portal reus --limite 5",
           "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset WHERE portal_id='reus' AND lower(titulo||' '||descripcion) GLOB '*arb*'\""
         ]
       }
@@ -993,7 +993,7 @@
         "metodo": "indice-local",
         "fecha": "2026-07-25",
         "comandos": [
-          "python3 -m tfm.index buscar 'alquiler vivienda' --portal cordoba --limite 5",
+          "python3 -m datosabiertos.index buscar 'alquiler vivienda' --portal cordoba --limite 5",
           "sqlite3 datos/indice.sqlite \"SELECT count(*) FROM dataset WHERE portal_id='cordoba' AND (lower(titulo||' '||descripcion) LIKE '%alquiler%' OR lower(titulo||' '||descripcion) LIKE '%vivienda%')\""
         ]
       }

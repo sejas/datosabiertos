@@ -1,4 +1,4 @@
-"""Punto de entrada: `python -m tfm.mcp`."""
+"""Punto de entrada: `python -m datosabiertos.mcp`."""
 
 import sys
 

@@ -4,8 +4,8 @@ Expone las cuatro herramientas del catálogo (véase el [README](../../README.md
 **Cero dependencias**: JSON-RPC 2.0 sobre stdio con la biblioteca estándar.
 
 ```bash
-python -m tfm.index build     # una vez: construye el índice
-python -m tfm.mcp             # arranca el servidor (habla por stdin/stdout)
+python -m datosabiertos.index build     # una vez: construye el índice
+python -m datosabiertos.mcp             # arranca el servidor (habla por stdin/stdout)
 python -m unittest discover -s tests   # 59 tests, sin red
 ```
 
@@ -26,8 +26,8 @@ restringe con cuatro salvaguardas. El argumento completo está en
 ## Dos transportes
 
 ```bash
-python -m tfm.mcp                      # stdio: para un cliente local
-python -m tfm.mcp.http --puerto 8080   # HTTP: para que lo use otra gente
+python -m datosabiertos.mcp                      # stdio: para un cliente local
+python -m datosabiertos.mcp.http --puerto 8080   # HTTP: para que lo use otra gente
 ```
 
 El HTTP expone `POST /mcp` (JSON-RPC), `GET /salud`, `GET /` con el catálogo y, si hay
@@ -81,7 +81,7 @@ Claude Desktop solo habla *stdio*; el puente `mcp-remote` (Node ≥ 20) lo resue
   "mcpServers": {
     "datosabiertos": {
       "command": "python3",
-      "args": ["-m", "tfm.mcp"],
+      "args": ["-m", "datosabiertos.mcp"],
       "cwd": "/ruta/a/datosabiertos"
     }
   }

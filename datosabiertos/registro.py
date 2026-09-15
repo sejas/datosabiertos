@@ -4,7 +4,7 @@ Dos destinos complementarios, tal y como exige el TODO 3.3:
 
 1. Un fichero de log rotativo (`datos/cosecha.log`) legible por una persona.
 2. La tabla `error_cosecha` del índice, consultable con SQL y con
-   `python -m tfm.index errores --portal madrid`.
+   `python -m datosabiertos.index errores --portal madrid`.
 
 El objeto `RegistroCosecha` es el que se pasa al cliente HTTP y a los conectores; acumula
 los errores en memoria y el almacén los vuelca a SQLite al cerrar la cosecha.
@@ -25,7 +25,7 @@ _configurado = False
 def configurar_log(ruta: Path, verboso: bool = False) -> logging.Logger:
     """Configura el log a fichero y a consola. Idempotente."""
     global _configurado
-    registrador = logging.getLogger("tfm")
+    registrador = logging.getLogger("datosabiertos")
     if not _configurado:
         ruta.parent.mkdir(parents=True, exist_ok=True)
         formato = logging.Formatter(

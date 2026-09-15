@@ -130,7 +130,7 @@ anotaciones. El listón es el mismo para todos, incluido el autor:
 1. **Parte de una necesidad, no de un dataset.** Si el enunciado es el título del dataset
    con un signo de interrogación, la pregunta no sirve.
 2. **Verifica contra el índice**, no contra tu memoria ni contra el buscador del portal.
-   Reconstruye el índice si hace falta: `python -m tfm.index build`.
+   Reconstruye el índice si hace falta: `python -m datosabiertos.index build`.
 3. **Rellena `verificacion.comandos`** con las órdenes exactas que has ejecutado. Una
    pregunta cuya verificación no se puede reejecutar no entra.
 4. **Si marcas `sin_respuesta`, añade al menos dos `comprobaciones_vacias`**, y en catálogos

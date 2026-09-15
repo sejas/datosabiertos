@@ -14,7 +14,7 @@ status: respuesta al correo de Óscar Corcho del 25/07/2026
 > **Etapa 2** — *"dime cuántos municipios tiene España basado en este dataset, o cuántos
 > distritos tiene Madrid, o cuál es el distrito con más estaciones de BiciMad"*.
 
-La etapa 1 está construida y funcionando (`tfm/mcp/`, 4 herramientas sobre 2.862 datasets).
+La etapa 1 está construida y funcionando (`datosabiertos/mcp/`, 4 herramientas sobre 2.862 datasets).
 La etapa 2 **no está cubierta en absoluto** y no es una extensión menor: cambia el
 almacenamiento, las herramientas, las métricas y una de las conclusiones del análisis de
 julio. Este documento mide cuánto.

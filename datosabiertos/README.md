@@ -1,4 +1,4 @@
-# `tfm` — índice local de catálogos municipales
+# `datosabiertos` — índice local de catálogos municipales
 
 Implementa los TODOs **3.1** (índice local), **3.3** (cosecha cortés) y adelanta el **3.2**
 (trazabilidad de procedencia). Sin dependencias externas: solo la biblioteca estándar de
@@ -7,13 +7,13 @@ Python 3.11+.
 ## Uso
 
 ```bash
-python -m tfm.index build                 # cosecha e indexa el corpus entero (idempotente)
-python -m tfm.index build --portal madrid --portal reus
-python -m tfm.index build --sin-crudo     # sin guardar el JSON original: índice mucho menor
-python -m tfm.index portales              # corpus y huecos pendientes de la fase 2.1
-python -m tfm.index buscar "calidad del aire" --portal malaga --anio 2025
-python -m tfm.index estado                # tamaño, recuentos y últimas cosechas
-python -m tfm.index errores --portal reus # errores registrados, consultables también por SQL
+python -m datosabiertos.index build                 # cosecha e indexa el corpus entero (idempotente)
+python -m datosabiertos.index build --portal madrid --portal reus
+python -m datosabiertos.index build --sin-crudo     # sin guardar el JSON original: índice mucho menor
+python -m datosabiertos.index portales              # corpus y huecos pendientes de la fase 2.1
+python -m datosabiertos.index buscar "calidad del aire" --portal malaga --anio 2025
+python -m datosabiertos.index estado                # tamaño, recuentos y últimas cosechas
+python -m datosabiertos.index errores --portal reus # errores registrados, consultables también por SQL
 python -m unittest discover -s tests      # 21 tests, sin red
 ```
 
@@ -73,7 +73,7 @@ es la red, no el disco.
 
 Tres pasos, sin tocar nada más. Está documentado en `conectores/base.py`:
 
-1. `tfm/conectores/<familia>.py` con una subclase de `ConectorCatalogo` que implemente
+1. `datosabiertos/conectores/<familia>.py` con una subclase de `ConectorCatalogo` que implemente
    `listar_crudos()` y `normalizar(crudo)`.
 2. Registrar la familia en `FAMILIAS`, en `conectores/__init__.py`.
 3. Dar de alta el portal en `CORPUS`, en `configuracion.py`.

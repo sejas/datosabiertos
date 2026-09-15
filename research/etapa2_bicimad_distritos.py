@@ -37,7 +37,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from tfm.configuracion import RUTA_INDICE, user_agent  # noqa: E402
+from datosabiertos.configuracion import RUTA_INDICE, user_agent  # noqa: E402
 
 KML_DISTRITOS = ("https://geoportal.madrid.es/fsdescargas/IDEAM_WBGEOPORTAL/"
                  "LIMITES_ADMINISTRATIVOS/Distritos/distritos.kml")
@@ -63,7 +63,7 @@ def estaciones_bicimad() -> list[tuple[float, float]]:
     ).fetchone()
     conexion.close()
     if not fila:
-        raise SystemExit("No está el dataset en el índice. Ejecuta: python -m tfm.index build")
+        raise SystemExit("No está el dataset en el índice. Ejecuta: python -m datosabiertos.index build")
     # utf-8-sig + strip: el fichero llega con BOM y con un salto de línea por delante.
     geo = json.loads(descargar(fila[0]).decode("utf-8-sig").strip())
     return [(f["geometry"]["coordinates"][0], f["geometry"]["coordinates"][1])

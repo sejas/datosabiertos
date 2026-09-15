@@ -148,7 +148,7 @@ anotador a declarar su intención; el esquema comprueba después que ambas cosas
 ### `ciudades` — obligatorio
 
 Lista de identificadores de portal (`madrid`, `barcelona`, `malaga`, `cordoba`, `reus`),
-los mismos de `tfm.configuracion.CORPUS`. Se usa para tres cosas: cortar los resultados por
+los mismos de `datosabiertos.configuracion.CORPUS`. Se usa para tres cosas: cortar los resultados por
 ciudad, comprobar que los datasets citados pertenecen a las ciudades declaradas, y
 comprobar que la traza no consulta portales que la pregunta no menciona.
 
@@ -256,7 +256,7 @@ contra estas firmas:
 Dos diferencias respecto al §4 del plan, ambas deliberadas:
 
 1. **`anio` y no `año`.** El argumento viaja en JSON y en línea de órdenes
-   (`python -m tfm.index buscar --anio`), donde una eñe es una fuente inagotable de
+   (`python -m datosabiertos.index buscar --anio`), donde una eñe es una fuente inagotable de
    problemas de codificación. La CLI del índice ya usa `anio`; el banco no inventa una
    tercera forma.
 2. **`comparar_ciudades` acepta `ciudades`**, que el plan no contempla. Sin ese argumento
@@ -350,7 +350,7 @@ referencia cuando es una opinión.
 "verificacion": {
   "metodo": "indice-local",
   "fecha": "2026-07-25",
-  "comandos": ["python3 -m tfm.index buscar 'arbolado' --portal reus --limite 5"]
+  "comandos": ["python3 -m datosabiertos.index buscar 'arbolado' --portal reus --limite 5"]
 }
 ```
 

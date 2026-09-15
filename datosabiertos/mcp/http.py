@@ -1,6 +1,6 @@
 """Transporte HTTP para el servidor MCP, sin dependencias externas.
 
-    python -m tfm.mcp.http --puerto 8080
+    python -m datosabiertos.mcp.http --puerto 8080
 
 Sirve el mismo `ServidorMCP` que `stdio`, pero por red, para que lo use gente que no tiene
 el repositorio: es lo que hace data.gouv.fr con `mcp.data.gouv.fr`. Un cliente MCP se
@@ -67,10 +67,10 @@ def _servidor_del_hilo() -> ServidorMCP:
 
 
 class Manejador(BaseHTTPRequestHandler):
-    server_version = f"tfm-mcp/{cfg.VERSION}"
+    server_version = f"datosabiertos-mcp/{cfg.VERSION}"
 
     def log_message(self, formato, *args):  # noqa: A002 - firma de la stdlib
-        print(f"[tfm.mcp.http] {self.address_string()} {formato % args}", file=sys.stderr)
+        print(f"[datosabiertos.mcp.http] {self.address_string()} {formato % args}", file=sys.stderr)
 
     def _responder(self, codigo: int, cuerpo: dict | str, tipo="application/json") -> None:
         datos = (json.dumps(cuerpo, ensure_ascii=False) if isinstance(cuerpo, dict)
@@ -244,7 +244,7 @@ class Manejador(BaseHTTPRequestHandler):
 
 
 def principal(argv: list[str] | None = None) -> int:
-    analizador = argparse.ArgumentParser(prog="python -m tfm.mcp.http")
+    analizador = argparse.ArgumentParser(prog="python -m datosabiertos.mcp.http")
     analizador.add_argument("--puerto", type=int, default=8080)
     analizador.add_argument("--host", default="127.0.0.1",
                             help="0.0.0.0 para exponerlo fuera de la máquina")
@@ -263,12 +263,12 @@ def principal(argv: list[str] | None = None) -> int:
     CLIENTE_CHAT = chat.cliente_desde_entorno()
 
     if not cfg.RUTA_INDICE.exists():
-        print(f"No hay índice en {cfg.RUTA_INDICE}. Ejecuta: python -m tfm.index build",
+        print(f"No hay índice en {cfg.RUTA_INDICE}. Ejecuta: python -m datosabiertos.index build",
               file=sys.stderr)
         return 1
 
     servidor = ThreadingHTTPServer((args.host, args.puerto), Manejador)
-    print(f"[tfm.mcp.http] http://{args.host}:{args.puerto}/mcp · "
+    print(f"[datosabiertos.mcp.http] http://{args.host}:{args.puerto}/mcp · "
           f"{len(CATALOGO)} herramientas · índice {cfg.RUTA_INDICE}"
           + (f" · web {DIRECTORIO_ESTATICOS}" if DIRECTORIO_ESTATICOS else "")
           + (f" · chat con {CLIENTE_CHAT.modelo}" if CLIENTE_CHAT else " · sin chat alojado"),
@@ -276,7 +276,7 @@ def principal(argv: list[str] | None = None) -> int:
     try:
         servidor.serve_forever()
     except KeyboardInterrupt:
-        print("[tfm.mcp.http] cierre", file=sys.stderr)
+        print("[datosabiertos.mcp.http] cierre", file=sys.stderr)
     finally:
         servidor.server_close()
     return 0

@@ -32,7 +32,7 @@ def crear_conector(
         raise KeyError(
             f"no hay conector para la familia '{portal.familia}' del portal "
             f"'{portal.id}'. Familias registradas: {disponibles}. "
-            f"Añade una subclase de ConectorCatalogo (véase tfm/conectores/base.py)."
+            f"Añade una subclase de ConectorCatalogo (véase datosabiertos/conectores/base.py)."
         ) from exc
     return clase(portal, cliente, registro)
 

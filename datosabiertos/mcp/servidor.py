@@ -1,6 +1,6 @@
 """Servidor MCP sobre stdio, sin dependencias externas.
 
-    python -m tfm.mcp
+    python -m datosabiertos.mcp
 
 Habla JSON-RPC 2.0 por entrada/salida estándar, que es el transporte `stdio` de MCP. Se
 implementan los métodos que un cliente necesita de verdad: `initialize`,
@@ -37,7 +37,7 @@ from .herramientas import CATALOGO
 #: propia y es él quien decide si sigue, como manda la especificación.
 VERSION_PROTOCOLO = "2025-06-18"
 
-INFO_SERVIDOR = {"name": "tfm-datos-abiertos", "title": "Datos abiertos municipales (TFM)",
+INFO_SERVIDOR = {"name": "datosabiertos", "title": "Datos abiertos municipales (TFM)",
                  "version": cfg.VERSION}
 
 INSTRUCCIONES = (
@@ -50,7 +50,7 @@ INSTRUCCIONES = (
 
 
 def _log(mensaje: str) -> None:
-    print(f"[tfm.mcp] {mensaje}", file=sys.stderr, flush=True)
+    print(f"[datosabiertos.mcp] {mensaje}", file=sys.stderr, flush=True)
 
 
 def _contenido(datos: dict) -> dict:
@@ -158,7 +158,7 @@ class ServidorMCP:
 
 def principal() -> int:
     if not cfg.RUTA_INDICE.exists():
-        _log(f"no hay índice en {cfg.RUTA_INDICE}. Constrúyelo con: python -m tfm.index build")
+        _log(f"no hay índice en {cfg.RUTA_INDICE}. Constrúyelo con: python -m datosabiertos.index build")
         return 1
     with Almacen(cfg.RUTA_INDICE) as almacen:
         try:

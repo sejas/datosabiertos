@@ -47,9 +47,9 @@ Los datos son **una copia** de los portales, no el portal en vivo. Toda respuest
 
 ```bash
 git clone git@github.com:sejas/datosabiertos.git && cd datosabiertos
-python -m tfm.index build          # cosecha los 5 portales (~2 min, respetando robots.txt)
-python -m tfm.index buscar "calidad del aire" --portal malaga
-python -m tfm.mcp                  # servidor MCP por stdio
+python -m datosabiertos.index build          # cosecha los 5 portales (~2 min, respetando robots.txt)
+python -m datosabiertos.index buscar "calidad del aire" --portal malaga
+python -m datosabiertos.mcp                  # servidor MCP por stdio
 python -m unittest discover -s tests
 ```
 
@@ -59,7 +59,7 @@ completa tarda unos 137 s en una Raspberry Pi 5, casi todo esperando por cortes�
 ### Como servidor HTTP o contenedor
 
 ```bash
-python -m tfm.mcp.http --puerto 8080 --estaticos web   # MCP en POST /mcp + cliente en /
+python -m datosabiertos.mcp.http --puerto 8080 --estaticos web   # MCP en POST /mcp + cliente en /
 docker compose up -d --build                            # lo mismo, empaquetado
 ```
 
@@ -93,7 +93,7 @@ razonamiento está en [`docs/03-prior-art.md`](docs/03-prior-art.md) §5.5.
 
 Para conectarlo a Claude Code, Codex, Claude Desktop, Cursor o VS Code —por HTTP contra el
 servidor público o por *stdio* en local— y para las decisiones de diseño del servidor:
-[`tfm/mcp/README.md`](tfm/mcp/README.md). Las mismas instrucciones, con botones de copiar,
+[`datosabiertos/mcp/README.md`](datosabiertos/mcp/README.md). Las mismas instrucciones, con botones de copiar,
 están en la sección «Conecta tu agente» de la [demo](https://datosabiertos.sejas.es/#conectar).
 
 ## Lo que hemos aprendido midiendo
@@ -117,7 +117,7 @@ con `TFM_RESPETAR_DISALLOW=1` se aplica la lectura estricta.
 ## Estructura
 
 ```
-tfm/            Índice local y servidor MCP (Python, sin dependencias)
+datosabiertos/            Índice local y servidor MCP (Python, sin dependencias)
   conectores/   Un módulo por familia de portal; añadir uno son 3 pasos
   mcp/          Herramientas, transporte stdio, transporte HTTP y chat con modelo alojado
 web/            Cliente del navegador: chat (servidor o WebLLM), búsqueda directa y guía MCP

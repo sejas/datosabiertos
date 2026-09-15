@@ -1,7 +1,7 @@
 /**
  * Las cuatro herramientas, en el navegador y sobre el mismo índice SQLite.
  *
- * Es el puerto de `tfm/mcp/herramientas.py`: mismos nombres, mismos argumentos y —lo que
+ * Es el puerto de `datosabiertos/mcp/herramientas.py`: mismos nombres, mismos argumentos y —lo que
  * importa— mismo contrato de procedencia. Toda ficha lleva `url_origen`,
  * `fecha_modificacion_origen`, `fecha_sincronizacion` y `licencia_declarada`, y la ausencia
  * viaja como instrucción (`sin_resultados`) en vez de como lista vacía.

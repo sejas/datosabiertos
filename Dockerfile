@@ -4,7 +4,7 @@
 FROM python:3.12-slim
 
 WORKDIR /app
-COPY tfm/ /app/tfm/
+COPY datosabiertos/ /app/datosabiertos/
 COPY web/ /app/web/
 COPY datos/indice.sqlite /app/datos/indice.sqlite
 
@@ -13,8 +13,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 EXPOSE 8080
 
-# El índice se abre en solo lectura (véase tfm/almacen.py): el contenedor no lo modifica.
+# El índice se abre en solo lectura (véase datosabiertos/almacen.py): el contenedor no lo modifica.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/salud',timeout=4).status==200 else 1)"
 
-CMD ["python", "-m", "tfm.mcp.http", "--host", "0.0.0.0", "--puerto", "8080", "--estaticos", "web"]
+CMD ["python", "-m", "datosabiertos.mcp.http", "--host", "0.0.0.0", "--puerto", "8080", "--estaticos", "web"]

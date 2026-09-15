@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/asejas/tfm-mcp-datos-abiertos/bench/esquema.json",
+  "$id": "https://github.com/sejas/datosabiertos/bench/esquema.json",
   "title": "BDAM-es — Banco de preguntas sobre catálogos de Datos Abiertos Municipales en español",
   "description": "Esquema del banco de evaluación del TFM (TODO 4.1). La justificación campo a campo está en bench/esquema.md; la metodología, en bench/README.md.",
   "type": "object",
@@ -75,7 +75,7 @@
 
   "$defs": {
     "portal": {
-      "description": "Identificador de portal tal y como aparece en tfm.configuracion.CORPUS.",
+      "description": "Identificador de portal tal y como aparece en datosabiertos.configuracion.CORPUS.",
       "type": "string",
       "enum": ["madrid", "barcelona", "malaga", "cordoba", "reus"]
     },

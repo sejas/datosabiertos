@@ -5,7 +5,7 @@
  *
  * 1. **Chat**. Dos motores intercambiables detrás de la misma interfaz:
  *    - *Servidor*: `POST /chat`. El modelo grande vive en OpenRouter y el bucle de agente
- *      corre en el servidor (`tfm/mcp/chat.py`), que nos manda un evento por paso. Es el
+ *      corre en el servidor (`datosabiertos/mcp/chat.py`), que nos manda un evento por paso. Es el
  *      experimento A del plan.
  *    - *Navegador*: WebLLM por WebGPU. El bucle corre aquí, contra el índice SQLite abierto
  *      en memoria con sql.js, y no sale nada de la máquina. Es el experimento B.

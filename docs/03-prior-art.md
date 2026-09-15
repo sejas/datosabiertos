@@ -801,7 +801,7 @@ Esa frase es la contribución del TFM, y es más fuerte que cualquiera de las cu
 
 ## 5. Decisión: fork, dependencia o reimplementación
 
-**Contexto que cambia el problema.** El índice local ya está implementado (`tfm/README.md`,
+**Contexto que cambia el problema.** El índice local ya está implementado (`datosabiertos/README.md`,
 25/07/2026): 2.862 datasets, 23.390 distribuciones, 5 portales, 63,4 MB, FTS5 en español,
 procedencia sellada en `ConectorCatalogo.cosechar()` con `ValueError` si falta, cosecha cortés con
 `Crawl-Delay` y backoff. **La cosecha y el almacenamiento ya no se compran fuera.** Lo único que se

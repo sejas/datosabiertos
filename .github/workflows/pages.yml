@@ -2,7 +2,7 @@
 #
 # El sitio es estático de verdad: el índice viaja como SQLite comprimido dentro del propio
 # repositorio y se consulta con sql.js en el navegador. No hay servidor detrás, así que el
-# servidor MCP en Python (tfm/mcp) no interviene aquí; para eso está el Dockerfile.
+# servidor MCP en Python (datosabiertos/mcp) no interviene aquí; para eso está el Dockerfile.
 name: Publicar el cliente web en Pages
 
 on:

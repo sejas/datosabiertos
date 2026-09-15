@@ -1,10 +1,10 @@
 """Interfaz de línea de órdenes del índice local.
 
-    python -m tfm.index build [--portal madrid] [--sin-crudo] [--verboso]
-    python -m tfm.index portales
-    python -m tfm.index buscar "calidad del aire" [--portal malaga] [--anio 2025]
-    python -m tfm.index estado
-    python -m tfm.index errores [--portal madrid]
+    python -m datosabiertos.index build [--portal madrid] [--sin-crudo] [--verboso]
+    python -m datosabiertos.index portales
+    python -m datosabiertos.index buscar "calidad del aire" [--portal malaga] [--anio 2025]
+    python -m datosabiertos.index estado
+    python -m datosabiertos.index errores [--portal madrid]
 
 `build` reconstruye desde cero los portales indicados (o el corpus entero). Es idempotente:
 cada portal se vacía antes de reindexarse, así que ejecutarlo dos veces deja el mismo índice.
@@ -70,7 +70,7 @@ def construir(args: argparse.Namespace) -> int:
     for fila in estadisticas["por_portal"]:
         print(f"{fila['id']:<12}{fila['municipio']:<14}{fila['n']:>9}{fila['sin_licencia'] or 0:>10}")
     if fallos:
-        print(f"\n{fallos} portal(es) sin resultados. Revisa: python -m tfm.index errores")
+        print(f"\n{fallos} portal(es) sin resultados. Revisa: python -m datosabiertos.index errores")
     return 1 if fallos == len(portales) else 0
 
 
@@ -179,7 +179,7 @@ def errores(args: argparse.Namespace) -> int:
 
 def principal(argv: list[str] | None = None) -> int:
     analizador = argparse.ArgumentParser(
-        prog="python -m tfm.index", description="Índice local de catálogos municipales."
+        prog="python -m datosabiertos.index", description="Índice local de catálogos municipales."
     )
     subordenes = analizador.add_subparsers(dest="orden", required=True)
 

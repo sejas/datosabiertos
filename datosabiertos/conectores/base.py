@@ -5,7 +5,7 @@
 Añadir un portal nuevo —Gijón y Zaragoza son los que faltan, y son la tarea 2.1 del
 `TODOS.md`— consiste **exactamente** en tres pasos, sin tocar nada más del paquete:
 
-1. Crear `tfm/conectores/<familia>.py` con una subclase de `ConectorCatalogo` que
+1. Crear `datosabiertos/conectores/<familia>.py` con una subclase de `ConectorCatalogo` que
    implemente dos métodos:
 
    - `listar_crudos()`: genera los registros tal y como los devuelve el portal (dict).
@@ -13,9 +13,9 @@ Añadir un portal nuevo —Gijón y Zaragoza son los que faltan, y son la tarea 
      Debe usar `self.cliente.obtener_json(...)` para heredar cortesía, reintentos y log.
    - `normalizar(crudo)`: traduce un registro crudo a `DatasetNormalizado`.
 
-2. Registrar la familia en `tfm/conectores/__init__.py` (diccionario `FAMILIAS`).
+2. Registrar la familia en `datosabiertos/conectores/__init__.py` (diccionario `FAMILIAS`).
 
-3. Dar de alta el portal en `CORPUS` de `tfm/configuracion.py` con `familia="<familia>"`.
+3. Dar de alta el portal en `CORPUS` de `datosabiertos/configuracion.py` con `familia="<familia>"`.
 
 Todo lo demás —cortesía, `robots.txt`, *backoff*, esquema SQLite, FTS5, procedencia,
 marcado de licencia no declarada, CLI— ya funciona para el conector nuevo. El método

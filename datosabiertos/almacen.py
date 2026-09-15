@@ -4,7 +4,7 @@ El almacén solo conoce `DatasetNormalizado`: no sabe qué es CKAN ni ArcGIS. Es
 es la que permite añadir Gijón o Zaragoza (fase 2.1) sin tocar este fichero.
 
 Reconstrucción idempotente: `reemplazar_portal()` borra lo que hubiera de ese portal antes
-de insertar, de modo que `python -m tfm.index build` deja siempre el mismo resultado se
+de insertar, de modo que `python -m datosabiertos.index build` deja siempre el mismo resultado se
 ejecute una vez o diez.
 """
 

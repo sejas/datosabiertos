@@ -17,12 +17,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from tfm.almacen import Almacen  # noqa: E402
-from tfm.conectores.ckan import ConectorCKAN  # noqa: E402
-from tfm.configuracion import CORPUS, Portal  # noqa: E402
-from tfm.mcp import herramientas as h  # noqa: E402
-from tfm.mcp.servidor import VERSION_PROTOCOLO, ServidorMCP  # noqa: E402
-from tfm.registro import ahora_utc  # noqa: E402
+from datosabiertos.almacen import Almacen  # noqa: E402
+from datosabiertos.conectores.ckan import ConectorCKAN  # noqa: E402
+from datosabiertos.configuracion import CORPUS, Portal  # noqa: E402
+from datosabiertos.mcp import herramientas as h  # noqa: E402
+from datosabiertos.mcp.servidor import VERSION_PROTOCOLO, ServidorMCP  # noqa: E402
+from datosabiertos.registro import ahora_utc  # noqa: E402
 
 # Se reutilizan dos portales del corpus real para que los `enum` de los esquemas encajen.
 PORTAL_MADRID = CORPUS["madrid"]
@@ -259,7 +259,7 @@ class TestTransporteHTTP(BaseIndice):
     """El manejador HTTP encamina al mismo ServidorMCP que stdio."""
 
     def test_las_rutas_declaradas_existen(self):
-        from tfm.mcp import http as modulo
+        from datosabiertos.mcp import http as modulo
         for metodo in ("do_GET", "do_POST", "do_OPTIONS"):
             self.assertTrue(hasattr(modulo.Manejador, metodo))
         self.assertLessEqual(modulo.TAMANO_MAXIMO, 10_000_000)

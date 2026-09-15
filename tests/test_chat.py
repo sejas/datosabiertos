@@ -1,4 +1,4 @@
-"""Tests del chat con modelo alojado (`tfm.mcp.chat`). Sin red: el modelo se finge.
+"""Tests del chat con modelo alojado (`datosabiertos.mcp.chat`). Sin red: el modelo se finge.
 
 El transporte hacia OpenRouter es una función inyectable que recibe la carga JSON y devuelve
 las líneas SSE de la respuesta. Así se prueba el bucle de agente completo —llamada a
@@ -15,8 +15,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from tfm.mcp import chat  # noqa: E402
-from tfm.mcp.herramientas import CATALOGO  # noqa: E402
+from datosabiertos.mcp import chat  # noqa: E402
+from datosabiertos.mcp.herramientas import CATALOGO  # noqa: E402
 
 from test_mcp import BaseIndice  # noqa: E402
 
@@ -225,7 +225,7 @@ class TestRutaChat(BaseIndice):
         import threading
         from http.server import ThreadingHTTPServer
 
-        from tfm.mcp import http as modulo
+        from datosabiertos.mcp import http as modulo
 
         self.modulo = modulo
         self._estado_previo = (modulo.CLIENTE_CHAT, modulo.LIMITADOR_CHAT, modulo.cfg.RUTA_INDICE)

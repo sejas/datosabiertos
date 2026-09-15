@@ -51,7 +51,7 @@ from pathlib import Path
 # --------------------------------------------------------------------------------------
 #
 # `anio` en vez de `año`: PLAN.md escribe `año`, pero el argumento viaja en JSON y en la
-# CLI (`python -m tfm.index buscar --anio`), donde una eñe es una fuente inagotable de
+# CLI (`python -m datosabiertos.index buscar --anio`), donde una eñe es una fuente inagotable de
 # problemas de codificación. La divergencia está documentada en esquema.md §3.
 #
 # `comparar_ciudades` acepta `ciudades` además de `tema`, que es lo único que pide el plan:
@@ -511,8 +511,8 @@ def validar_semantica(banco: dict, esquema: dict, diag: Diagnostico) -> None:
 # 3. Verificación contra el índice local (opcional)
 # --------------------------------------------------------------------------------------
 
-#: Copia deliberada de `tfm.esquema`: el banco se publica suelto en Zenodo y este fichero
-#: tiene que seguir funcionando sin el paquete `tfm` al lado. Si cambia allí, cambia aquí,
+#: Copia deliberada de `datosabiertos.esquema`: el banco se publica suelto en Zenodo y este fichero
+#: tiene que seguir funcionando sin el paquete `datosabiertos` al lado. Si cambia allí, cambia aquí,
 #: y el aviso de la comprobación lo delata (los recuentos dejarían de cuadrar).
 _VACIAS = frozenset(
     """

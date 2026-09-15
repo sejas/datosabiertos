@@ -3,7 +3,7 @@
 - `herramientas`: las cuatro herramientas del §4 del plan, como funciones Python.
 - `servidor`: transporte MCP sobre stdio (JSON-RPC 2.0), sin dependencias.
 
-`python -m tfm.mcp` arranca el servidor.
+`python -m datosabiertos.mcp` arranca el servidor.
 """
 
 from .herramientas import CATALOGO

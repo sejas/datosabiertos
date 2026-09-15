@@ -95,7 +95,7 @@ RUTA_LOG = Path(os.environ.get("TFM_RUTA_LOG", DIRECTORIO_DATOS / "cosecha.log")
 class Portal:
     """Un portal municipal cosechable.
 
-    `familia` selecciona el conector (véase `tfm.conectores.crear_conector`). Añadir Gijón
+    `familia` selecciona el conector (véase `datosabiertos.conectores.crear_conector`). Añadir Gijón
     o Zaragoza en la fase 2.1 es añadir una familia nueva y su subclase de
     `ConectorCatalogo`, sin tocar nada más.
     """
@@ -166,7 +166,7 @@ CORPUS: dict[str, Portal] = {
 }
 
 #: Portales previstos para la fase 2.1 y todavía no implementados. Se listan para que
-#: `python -m tfm.index portales` deje explícito el hueco en lugar de ocultarlo.
+#: `python -m datosabiertos.index portales` deje explícito el hueco en lugar de ocultarlo.
 PENDIENTES_FASE_2_1 = {
     "gijon": "opendata.gijon.es — REST ad-hoc (`descargar.php`), sin API CKAN",
     "zaragoza": "zaragoza.es/sede/servicio — REST propio, sin API CKAN",

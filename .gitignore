@@ -1,5 +1,5 @@
 # Índice de trabajo completo (62 MB, incluye el JSON crudo de cada portal): se reconstruye
-# con `python -m tfm.index build`, no se versiona.
+# con `python -m datosabiertos.index build`, no se versiona.
 /datos/
 cat/
 
