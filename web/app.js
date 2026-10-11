@@ -140,6 +140,7 @@ async function abrirIndice() {
     opcion.textContent = c.municipio;
     selector.append(opcion);
   }
+  if (!salud) pintarCifras(cifrasDelIndice());
 }
 
 async function consultarSalud() {
@@ -150,19 +151,40 @@ async function consultarSalud() {
   } catch {
     salud = null;
   }
-  const cifras = $('cifras');
-  if (salud) {
-    cifras.innerHTML = [
-      `<strong>${formatearNumero(salud.datasets)}</strong> datasets`,
-      `<strong>${formatearNumero(salud.distribuciones)}</strong> distribuciones`,
-      `<strong>${salud.ciudades.length}</strong> ciudades`,
-      `<strong>${formatearNumero(salud.sin_licencia_declarada)}</strong> sin licencia declarada`,
-      `sincronizado <strong>${(salud.ultima_sincronizacion || '?').slice(0, 10)}</strong>`,
-    ].map((t) => `<span>${t}</span>`).join('');
-  } else {
-    cifras.innerHTML = '<span>servidor no disponible: solo búsqueda directa y modelo en el navegador</span>';
-  }
+  pintarCifras(salud ?? (bd ? cifrasDelIndice() : null));
   configurarMotores();
+}
+
+/** Las mismas cifras que da /salud, calculadas sobre el índice: sirve cuando no hay servidor. */
+function cifrasDelIndice() {
+  const escalar = (sql) => bd.exec(sql)[0]?.values[0][0] ?? null;
+  let ultima = null;
+  try {
+    ultima = escalar("SELECT valor FROM metadatos_indice WHERE clave = 'ultima_sincronizacion'");
+  } catch { /* índice sin tabla de metadatos */ }
+  return {
+    datasets: escalar('SELECT COUNT(*) FROM dataset'),
+    distribuciones: escalar('SELECT COUNT(*) FROM distribucion'),
+    ciudades: ciudades(bd),
+    sin_licencia_declarada: escalar('SELECT COUNT(*) FROM dataset d JOIN licencia l ON l.id = d.licencia_id WHERE l.declarada = 0'),
+    ultima_sincronizacion: ultima ?? escalar('SELECT MAX(fecha_sincronizacion) FROM dataset'),
+  };
+}
+
+function pintarCifras(datos) {
+  const cifras = $('cifras');
+  if (!datos) {
+    cifras.innerHTML = '<p class="cifras-nota">Servidor no disponible: solo búsqueda directa y modelo ' +
+      'en el navegador. Las cifras aparecerán cuando se descargue el índice.</p>';
+    return;
+  }
+  cifras.innerHTML = [
+    [formatearNumero(datos.datasets), 'datasets'],
+    [formatearNumero(datos.distribuciones), 'distribuciones'],
+    [datos.ciudades.length, 'ciudades'],
+    [formatearNumero(datos.sin_licencia_declarada), 'sin licencia declarada'],
+    [(datos.ultima_sincronizacion || '?').slice(0, 10), 'última sincronización'],
+  ].map(([n, t]) => `<div class="cifra"><strong>${escapar(n)}</strong><span>${t}</span></div>`).join('');
 }
 
 // --------------------------------------------------------------------------------------
