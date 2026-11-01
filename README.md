@@ -37,7 +37,7 @@ conviene leerlo como tal:
 | Portales indexados | Madrid, Barcelona, Málaga, Córdoba y Reus |
 | Última sincronización del índice publicado | 25/07/2026 |
 | Tests | 59, sin red |
-| Banco de evaluación | 15 preguntas de las 80–120 previstas |
+| Banco de evaluación | 101 preguntas (v0.2.0), verificadas contra el índice; sin segundo anotador |
 | Evaluación de modelos | **todavía no ejecutada** |
 
 Los datos son **una copia** de los portales, no el portal en vivo. Toda respuesta incluye

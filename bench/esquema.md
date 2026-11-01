@@ -3,7 +3,7 @@ type: note
 title: Esquema del banco de evaluación BDAM-es
 date: 2026-07-25
 tags: [tfm, banco-evaluacion, esquema, mcp, datos-abiertos]
-status: v1 — cubre el TODO 4.1
+status: v1.1 — cubre el TODO 4.1; añade `ambito` y `por_que_requiere_mcp` (01/11/2026)
 ---
 
 # Esquema del banco de evaluación BDAM-es
@@ -154,6 +154,21 @@ comprobar que la traza no consulta portales que la pregunta no menciona.
 
 En las preguntas sin respuesta indica **dónde se buscó**, que es justamente el dato que
 hace falsable la afirmación «no existe».
+
+### `ambito` — obligatorio · vocabulario cerrado *(nuevo en v0.2.0)*
+
+`medio-ambiente`, `movilidad-transporte`, `hacienda-presupuestos`, `sector-publico`,
+`poblacion-demografia`, `urbanismo-vivienda`, `servicios-sociales`, `salud`, `educacion`,
+`cultura-ocio-deporte`, `turismo`, `comercio-empleo-economia`, `seguridad-emergencias`,
+`equipamientos-infraestructuras`, `catalogo`.
+
+El área temática de la **necesidad del usuario**, no la categoría que el portal asigna al
+dataset (cada portal tiene su propia taxonomía: Málaga clasifica los museos en
+«ordenación del territorio»). Existe por una razón medida: en la v0.1.0, **10 de las 15
+preguntas eran de medio ambiente**, porque calidad del aire y arbolado son de los pocos temas
+que publican varias ciudades. Sin el campo, ese sesgo no se ve; con él, `validar.py
+--composicion` lo imprime. `catalogo` se reserva para preguntas sobre el propio portal
+(licencias, publicadores, frescura del conjunto) y no sobre un tema.
 
 ### `sin_respuesta` — obligatorio · booleano
 
@@ -324,12 +339,46 @@ más probable, que no es no encontrar el dataset sino adornarlo.
 `recuperacion-directa`, `procedencia`, `licencia`, `licencia-no-declarada`,
 `licencia-compartir-igual`, `formatos`, `frescura`, `conteo`, `agregacion`, `comparacion`,
 `multiciudad`, `multilingue`, `heterogeneidad`, `reintento-de-consulta`,
-`ausencia-parcial`, `sin-respuesta`, `alucinacion`, `cordoba-peor-caso`.
+`ausencia-parcial`, `sin-respuesta`, `alucinacion`, `cordoba-peor-caso`, y desde la v0.2.0
+`publicador`, `frecuencia-actualizacion`, `presuposicion-falsa` y
+`metadatos-inconsistentes` (los metadatos del portal se contradicen entre sí).
 
 Marcan **el fenómeno que la pregunta ejercita**, que es la unidad de análisis útil: no
 interesa tanto «acertó 11 de 15» como «falla sistemáticamente cuando el catálogo está en
 catalán». El vocabulario es cerrado (enum) a propósito: unas etiquetas libres se convierten
 en cincuenta sinónimos y dejan de servir para agrupar.
+
+### `por_que_requiere_mcp` — obligatorio (≥1) · vocabulario cerrado *(nuevo en v0.2.0)*
+
+Por qué un modelo **sin acceso al índice** —en modo «libro cerrado», contestando de
+memoria— no puede responder bien. Es la hipótesis central del experimento con y sin MCP,
+declarada **antes** de ejecutarlo y pregunta a pregunta:
+
+| Valor | Qué no puede saber un modelo de memoria |
+|---|---|
+| `identificador-no-adivinable` | La URL o el identificador exacto del dataset (UUID de CKAN, número de catálogo de Madrid). |
+| `dato-posterior-al-entrenamiento` | Algo publicado o modificado en 2025–2026, después del corte de casi cualquier modelo. |
+| `conteo-exacto` | Cuántos datasets, distribuciones o años hay. |
+| `licencia-concreta` | La licencia de ese dataset, que no siempre es la «habitual». |
+| `formato-concreto` | En qué formatos se distribuye. |
+| `publicador-concreto` | Qué organismo o empresa municipal lo publica. |
+| `ausencia-verificable` | Que algo **no** existe. Un modelo de memoria no puede demostrar una ausencia; solo suponerla o, peor, rellenarla. |
+| `idioma-del-catalogo` | Que el dataset está titulado en catalán o en inglés y la pregunta en castellano no lo encuentra. |
+| `cola-larga` | Datos de catálogos pequeños (Reus, Córdoba) casi ausentes de la web y, por tanto, del corpus de entrenamiento. |
+| `contradice-lo-plausible` | La respuesta correcta es la contraria de la que un modelo daría por probabilidad. |
+| `comparacion-entre-catalogos` | Exige el estado de varios portales a la vez. |
+
+**Por qué un campo y no una etiqueta más.** Las etiquetas describen el fenómeno que se
+ejercita *con* herramientas; este campo describe por qué fallaría *sin* ellas. Son ejes
+distintos: `bdam-es-004` (licencia de Córdoba) ejercita `licencia-no-declarada`, pero lo
+que la hace imposible de memoria es que `contradice-lo-plausible`. Separarlos permite, al
+analizar el experimento, preguntar «¿qué motivos sigue fallando el modelo **con** MCP?»,
+que es lo que señala qué herramienta mejorar.
+
+**Qué no es.** No es una predicción de que el modelo fallará: es la razón por la que
+*debería* fallar. Si un modelo acierta de memoria una pregunta marcada
+`identificador-no-adivinable`, o la pregunta está mal anotada o el dato estaba en su
+corpus; en ambos casos hay que revisarla, y el campo es lo que permite encontrarla.
 
 ### `notas_anotador` — obligatorio (≥20 caracteres)
 
@@ -378,8 +427,9 @@ exacto en cada mensaje de error:
    dataset de la propia pregunta.
 8. *(aviso)* Las preguntas `sin_respuesta` llevan la etiqueta `sin-respuesta` y al menos un
    criterio negativo.
-9. Con `--indice`: los datasets existen, las URL coinciden y las `comprobaciones_vacias`
-   siguen devolviendo cero.
+9. Con `--indice`: los datasets existen, las URL coinciden, las `comprobaciones_vacias`
+   siguen devolviendo cero y cada `buscar_datasets` / `comparar_ciudades` de la traza se
+   comporta como dice su `resultado_esperado` (con los mismos filtros que la herramienta).
 10. Con `--composicion`: reparto del TODO 4.2 (≥15 % multiciudad, ≥10 % sin respuesta,
     las tres dificultades presentes, todas las ciudades cubiertas y Córdoba entre ellas).
 

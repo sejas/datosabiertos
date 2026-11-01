@@ -1,8 +1,18 @@
 # BDAM-es — Banco de preguntas sobre catálogos de datos abiertos municipales en español
 
-**Estado: v0.1.0, semilla de 15 preguntas.** Cubre el TODO 4.1 (esquema y validador) y
-siembra el TODO 4.2, que pide 80–120. No es el banco terminado: es su formato, su
-metodología y las primeras quince preguntas verificadas contra datos reales.
+**Estado: v0.2.0, 101 preguntas verificadas contra el índice.** Cubre el TODO 4.1 (esquema
+y validador) y la cifra del TODO 4.2 (80–120). Las 15 primeras (`bdam-es-001` a `-015`) las
+redactó y verificó a mano el autor; las 86 restantes se redactaron con asistencia de un
+modelo de lenguaje y se verificaron mecánicamente contra el índice, pero **están pendientes
+de revisión humana** (ver [Limitaciones](#limitaciones-conocidas)).
+
+**Qué mide.** Cada pregunta pide un hecho que un modelo **no puede saber de memoria** —una
+URL exacta, una licencia que no es la habitual, una fecha de 2026, un recuento, un título en
+catalán, una ausencia— y que sí puede leer en el resultado de una a tres llamadas a las
+herramientas MCP. La dificultad está en el conocimiento, no en el razonamiento: la hipótesis
+es que con el MCP incluso un modelo pequeño acierta lo que uno grande falla sin él. El campo
+`por_que_requiere_mcp` declara, pregunta a pregunta, por qué debería fallar un modelo sin
+herramientas. La memoria lo desarrolla en el capítulo 6 (`memoria/cap6-evaluacion.md`).
 
 Un agente LLM puede consultar catálogos de datos abiertos municipales españoles mediante
 MCP. Lo que no había forma de saber es **si lo hace bien**: no existe ningún banco de
@@ -12,9 +22,11 @@ referencia y trazas de herramientas. Los benchmarks de *tool-calling* de referen
 
 | | |
 |---|---|
-| Preguntas | 15 (5 fáciles · 5 medias · 5 difíciles) |
-| Multiciudad | 3 (20 %) |
-| Sin respuesta posible | 3 (20 %) |
+| Preguntas | 101 (31 fáciles · 35 medias · 35 difíciles) |
+| Multiciudad | 17 (16,8 %) |
+| Sin respuesta posible | 18 (17,8 %) |
+| Criterios de respuesta | 458, de ellos 168 negativos (`NO: …`) |
+| Ámbitos temáticos | los 15 del vocabulario; el mayor, movilidad (14) |
 | Ciudades | Madrid, Barcelona, Málaga, Córdoba, Reus |
 | Verificadas contra | índice local de 2.862 datasets, sincronizado el 25/07/2026 |
 | Licencia | CC BY-SA 4.0 |
@@ -34,16 +46,21 @@ python3 bench/validar.py bench/preguntas.json
 python3 bench/validar.py bench/preguntas.json --indice datos/indice.sqlite --composicion
 ```
 
-Salida esperada hoy:
+Salida esperada hoy (la CLI `python3 -m datosabiertos.index buscar` sale con código 1 cuando
+no hay resultados: en los `verificacion.comandos` de las comprobaciones vacías eso es lo
+esperado, no un fallo):
 
 ```
-OK · 15 preguntas válidas contra esquema.json y verificadas contra indice.sqlite
+OK · 101 preguntas válidas contra esquema.json y verificadas contra indice.sqlite
 
-Composición · 15 preguntas
-  dificultad : dificil=5, facil=5, media=5
-  ciudad     : barcelona=4, cordoba=5, madrid=5, malaga=5, reus=5
-  multiciudad: 3
-  sin respuesta posible: 3
+Composición · 101 preguntas
+  dificultad : dificil=35, facil=31, media=35
+  ciudad     : barcelona=32, cordoba=27, madrid=35, malaga=34, reus=23
+  multiciudad: 17
+  sin respuesta posible: 18
+  etiquetas  : agregacion=7, alucinacion=23, ausencia-parcial=12, comparacion=13, conteo=14, cordoba-peor-caso=13, formatos=22, frecuencia-actualizacion=6, frescura=38, heterogeneidad=6, licencia=25, licencia-compartir-igual=10, licencia-no-declarada=13, metadatos-inconsistentes=27, multiciudad=16, multilingue=36, presuposicion-falsa=17, procedencia=40, publicador=14, recuperacion-directa=32, reintento-de-consulta=27, sin-respuesta=18
+  ámbito     : catalogo=4, comercio-empleo-economia=9, cultura-ocio-deporte=4, educacion=3, equipamientos-infraestructuras=6, hacienda-presupuestos=5, medio-ambiente=11, movilidad-transporte=14, poblacion-demografia=5, salud=5, sector-publico=9, seguridad-emergencias=6, servicios-sociales=5, turismo=7, urbanismo-vivienda=8
+  requiere MCP por: ausencia-verificable=27, cola-larga=21, comparacion-entre-catalogos=14, conteo-exacto=14, contradice-lo-plausible=34, dato-posterior-al-entrenamiento=39, formato-concreto=17, identificador-no-adivinable=46, idioma-del-catalogo=28, licencia-concreta=20, publicador-concreto=12
 ```
 
 ## Metodología
@@ -190,24 +207,29 @@ concurrencia ≤2 por host, `User-Agent` identificable con contacto y respetando
 
 Se enumeran aquí y no en una nota al pie porque son las preguntas que hará el tribunal.
 
-1. **Tamaño.** 15 preguntas, no 80–120. Es una semilla del TODO 4.2, no el banco final.
-   Con 15 preguntas ninguna diferencia entre modelos será estadísticamente significativa.
-2. **Un solo anotador.** Todas las preguntas son de `A1`. Un banco anotado por una sola
+1. **Tamaño.** 101 preguntas bastan para detectar diferencias grandes entre condiciones
+   (20–30 puntos, prueba de McNemar pareada), no diferencias finas entre modelos parecidos.
+2. **Redacción asistida y un solo anotador.** Las preguntas `bdam-es-016` a `-101` se
+   redactaron con un modelo de lenguaje en cinco lotes y se verificaron con `validar.py
+   --indice` y ejecutando sus trazas contra las herramientas reales; **falta la revisión
+   humana pregunta a pregunta**. Riesgo de circularidad: preguntas escritas por un modelo
+   para medir modelos. Mitigación: la verdad de referencia es el índice, y la condición de
+   libro cerrado señala las preguntas memorizables. Todas son de `A1`. Un banco anotado por una sola
    persona es una opinión bien documentada, no una referencia. El TODO 4.3 exige reanotar
    ≥20 % de forma independiente y reportar el acuerdo (Cohen's κ). **Sin hacer.**
 3. **Verificación sobre el índice, no sobre el portal en vivo.** El TODO 4.2 pide
    verificación «a mano en el portal de origen»; aquí el método es `indice-local` en las
-   quince. Es defendible —los portales devuelven 403 y 503 de forma no determinista— pero
+   101. Es defendible —los portales devuelven 403 y 503 de forma no determinista— pero
    **no es lo que pide el criterio**, y el campo `verificacion.metodo` lo deja registrado
-   en lugar de disimularlo. Pendiente: una pasada manual sobre las quince fichas.
+   en lugar de disimularlo. Pendiente: una pasada manual sobre las fichas.
 4. **Instantánea única.** Las respuestas son ciertas sobre el índice del 25/07/2026. Los
    portales cambian: parte del banco caducará. `comprobaciones_vacias` y
    `validar.py --indice` sirven justamente para detectarlo pronto.
 5. **Corpus incompleto.** Faltan Gijón y Zaragoza, los dos portales sin API estándar, y con
    ellos el caso de un catálogo que hay que raspar.
-6. **Sesgo temático.** Medio ambiente, presupuestos y equipamientos están sobrerrepresentados
-   porque son los temas comunes a las cinco ciudades. Movilidad, empleo y urbanismo apenas
-   aparecen.
+6. **Sesgo temático, corregido en parte.** En la v0.1.0, 10 de 15 preguntas eran de medio
+   ambiente. Desde la v0.2.0 el campo `ambito` lo hace visible y los 15 ámbitos están
+   cubiertos, pero educación (3) y cultura (4) siguen escasos.
 7. **Sin preguntas conversacionales.** Todas son de un solo turno. El seguimiento
    («¿y en Barcelona?») no se mide.
 8. **Las trazas son una referencia, no la única solución válida.** Un agente puede resolver
@@ -224,7 +246,7 @@ Se enumeran aquí y no en una nota al pie porque son las preguntas que hará el 
 Pendiente de DOI (TODO 4.4). Hasta entonces:
 
 > Sejas, A. (2026). *BDAM-es: banco de preguntas sobre catálogos de datos abiertos
-> municipales españoles en español*, v0.1.0. Trabajo Fin de Máster, Máster Universitario en
+> municipales españoles en español*, v0.2.0. Trabajo Fin de Máster, Máster Universitario en
 > Inteligencia Artificial, Universidad Politécnica de Madrid. Director: Óscar Corcho.
 
 Al citarlo, indica la `version_banco` y la `fecha_sincronizacion` de la instantánea: sin

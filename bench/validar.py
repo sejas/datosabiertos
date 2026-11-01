@@ -544,6 +544,23 @@ def _consulta_fts(texto: str) -> str:
     return " ".join(f'"{_singularizar(p).replace(chr(34), chr(34) * 2)}"*' for p in utiles)
 
 
+def _contar(conexion, consulta: str, ciudad=None, tema=None, anio=None) -> int:
+    """Cuenta lo que devolvería `buscar_datasets` con esos argumentos (mismo FTS y filtros)."""
+    sql = "SELECT count(DISTINCT d.id) FROM dataset d JOIN dataset_fts f ON f.dataset_id = d.id"
+    condiciones, parametros = ["dataset_fts MATCH ?"], [_consulta_fts(consulta)]
+    if tema:
+        sql += " JOIN dataset_tema dt ON dt.dataset_id = d.id JOIN tema t ON t.id = dt.tema_id"
+        condiciones.append("t.normalizado LIKE ?")
+        parametros.append(f"%{_sin_acentos(tema).lower().strip()}%")
+    if ciudad:
+        condiciones.append("d.portal_id = ?")
+        parametros.append(ciudad)
+    if anio:
+        condiciones.append("substr(d.fecha_modificacion_origen, 1, 4) = ?")
+        parametros.append(str(anio))
+    return conexion.execute(f"{sql} WHERE {' AND '.join(condiciones)}", parametros).fetchone()[0]
+
+
 def verificar_contra_indice(banco: dict, ruta_indice: Path, diag: Diagnostico) -> None:
     if not ruta_indice.exists():
         diag.error("--indice", f"no existe el índice {ruta_indice}")
@@ -586,17 +603,31 @@ def verificar_contra_indice(banco: dict, ruta_indice: Path, diag: Diagnostico) -
                             pid,
                         )
 
+            # Las búsquedas de la traza tienen que comportarse como dice `resultado_esperado`:
+            # un «callejón sin salida legítimo» que deja de estar vacío, o una búsqueda que
+            # deja de encontrar nada, invalida la traza aunque el dataset siga existiendo.
+            for j, llamada in enumerate(p.get("traza_esperada", [])):
+                args = llamada.get("argumentos", {})
+                esperado = llamada.get("resultado_esperado")
+                if llamada.get("herramienta") == "buscar_datasets" and args.get("consulta"):
+                    total = _contar(conexion, args["consulta"], args.get("ciudad"),
+                                    args.get("tema"), args.get("anio"))
+                elif llamada.get("herramienta") == "comparar_ciudades" and args.get("tema"):
+                    total = sum(_contar(conexion, args["tema"], c)
+                                for c in args.get("ciudades") or banco.get(
+                                    "instantanea_indice", {}).get("portales", []))
+                else:
+                    continue
+                if esperado == "vacio" and total:
+                    diag.error(f"{base}.traza_esperada[{j}]",
+                               f"se espera vacío y la búsqueda devuelve {total} resultados", pid)
+                elif esperado == "con_resultados" and not total:
+                    diag.error(f"{base}.traza_esperada[{j}]",
+                               "se esperan resultados y la búsqueda no devuelve ninguno", pid)
+
             for j, comprobacion in enumerate(p.get("comprobaciones_vacias", [])):
-                expresion = _consulta_fts(comprobacion.get("consulta", ""))
-                sql = (
-                    "SELECT count(*) FROM dataset d "
-                    "JOIN dataset_fts f ON f.dataset_id = d.id WHERE dataset_fts MATCH ?"
-                )
-                parametros: list = [expresion]
-                if comprobacion.get("ciudad"):
-                    sql += " AND d.portal_id = ?"
-                    parametros.append(comprobacion["ciudad"])
-                total = conexion.execute(sql, parametros).fetchone()[0]
+                total = _contar(conexion, comprobacion.get("consulta", ""),
+                                comprobacion.get("ciudad"))
                 if total:
                     diag.error(
                         f"{base}.comprobaciones_vacias[{j}]",
@@ -634,7 +665,12 @@ def resumen_composicion(banco: dict) -> dict:
     por_dificultad: dict[str, int] = {}
     por_ciudad: dict[str, int] = {}
     por_etiqueta: dict[str, int] = {}
+    por_ambito: dict[str, int] = {}
+    por_motivo_mcp: dict[str, int] = {}
     for p in preguntas:
+        por_ambito[p.get("ambito", "?")] = por_ambito.get(p.get("ambito", "?"), 0) + 1
+        for motivo in p.get("por_que_requiere_mcp", []):
+            por_motivo_mcp[motivo] = por_motivo_mcp.get(motivo, 0) + 1
         por_dificultad[p.get("dificultad", "?")] = por_dificultad.get(p.get("dificultad", "?"), 0) + 1
         for ciudad in p.get("ciudades", []):
             por_ciudad[ciudad] = por_ciudad.get(ciudad, 0) + 1
@@ -645,6 +681,8 @@ def resumen_composicion(banco: dict) -> dict:
         "por_dificultad": por_dificultad,
         "por_ciudad": por_ciudad,
         "por_etiqueta": por_etiqueta,
+        "por_ambito": por_ambito,
+        "por_que_requiere_mcp": por_motivo_mcp,
         "multiciudad": sum(1 for p in preguntas if p.get("tipo") == "multiciudad"),
         "sin_respuesta": sum(1 for p in preguntas if p.get("sin_respuesta")),
     }
@@ -689,6 +727,9 @@ def imprimir_composicion(resumen: dict) -> None:
     print(f"  multiciudad: {resumen['multiciudad']}")
     print(f"  sin respuesta posible: {resumen['sin_respuesta']}")
     print("  etiquetas  :", ", ".join(f"{k}={v}" for k, v in sorted(resumen["por_etiqueta"].items())))
+    print("  ámbito     :", ", ".join(f"{k}={v}" for k, v in sorted(resumen["por_ambito"].items())))
+    print("  requiere MCP por:",
+          ", ".join(f"{k}={v}" for k, v in sorted(resumen["por_que_requiere_mcp"].items())))
 
 
 # --------------------------------------------------------------------------------------

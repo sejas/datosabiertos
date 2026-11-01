@@ -168,11 +168,13 @@
         "dificultad",
         "tipo",
         "ciudades",
+        "ambito",
         "sin_respuesta",
         "datasets_referencia",
         "traza_esperada",
         "respuesta_referencia",
         "criterios_respuesta",
+        "por_que_requiere_mcp",
         "notas_anotador",
         "anotador",
         "fecha_anotacion",
@@ -203,6 +205,27 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/portal" }
+        },
+        "ambito": {
+          "description": "Área temática de la necesidad del usuario. Permite comprobar que el banco no se concentra en los pocos temas que publican las cinco ciudades.",
+          "type": "string",
+          "enum": [
+            "medio-ambiente",
+            "movilidad-transporte",
+            "hacienda-presupuestos",
+            "sector-publico",
+            "poblacion-demografia",
+            "urbanismo-vivienda",
+            "servicios-sociales",
+            "salud",
+            "educacion",
+            "cultura-ocio-deporte",
+            "turismo",
+            "comercio-empleo-economia",
+            "seguridad-emergencias",
+            "equipamientos-infraestructuras",
+            "catalogo"
+          ]
         },
         "sin_respuesta": {
           "description": "Cierto si el dato no existe en la instantánea. Control de alucinación.",
@@ -275,7 +298,33 @@
               "ausencia-parcial",
               "sin-respuesta",
               "alucinacion",
-              "cordoba-peor-caso"
+              "cordoba-peor-caso",
+              "publicador",
+              "frecuencia-actualizacion",
+              "presuposicion-falsa",
+              "metadatos-inconsistentes"
+            ]
+          }
+        },
+        "por_que_requiere_mcp": {
+          "description": "Por qué un modelo sin acceso al índice (modo «libro cerrado») no puede responder bien. Es la hipótesis que el experimento con y sin MCP contrasta pregunta a pregunta.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "identificador-no-adivinable",
+              "dato-posterior-al-entrenamiento",
+              "conteo-exacto",
+              "licencia-concreta",
+              "formato-concreto",
+              "publicador-concreto",
+              "ausencia-verificable",
+              "idioma-del-catalogo",
+              "cola-larga",
+              "contradice-lo-plausible",
+              "comparacion-entre-catalogos"
             ]
           }
         },
